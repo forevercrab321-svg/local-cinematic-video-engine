@@ -1,107 +1,303 @@
 {
-  "validation_ts": "2026-03-31T06:29:39.737145",
+  "validation_ts": "2026-03-31T06:45:00.075305",
   "total": 10,
-  "passed": 10,
+  "passed": 2,
+  "degraded_passed": 8,
   "failed": 0,
-  "degraded": 0,
   "results": [
     {
       "preset_name": "suspense",
-      "schema_status": "old_schema",
+      "schema_status": "old",
+      "engine_mode": "static_ffmpeg",
       "route_selected": "static_ffmpeg",
-      "render_status": "success",
-      "render_time_sec": 0.67,
-      "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_suspense.mp4",
-      "file_size_mb": 0.1019,
+      "status": "success",
+      "validation_status": "degraded_pass",
+      "render_time_sec": 0.7,
+      "output_path": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_suspense.mp4",
+      "file_size_mb": 0.1,
+      "duration_sec": 5.0,
+      "fps": 24,
+      "resolution": "1080\u00d71920",
+      "source_image": "/Users/monsterlee/.openclaw/media/inbound/file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+      "source_frame_extracted_from_video": null,
+      "timeline_applied": {
+        "hold_start_sec": 0.0,
+        "main_move_start_sec": 0.0,
+        "main_move_end_sec": 5.0,
+        "hold_end_sec": 0.0
+      },
+      "camera_params_applied": {
+        "move": "static",
+        "zoom_start": 1.0,
+        "zoom_end": 1.0,
+        "x_start": 0.5,
+        "x_end": 0.5,
+        "y_start": 0.5,
+        "y_end": 0.5,
+        "rotation_start_deg": 0.0,
+        "rotation_end_deg": 0.0,
+        "easing": "linear"
+      },
       "effects_requested": [],
       "effects_applied": [],
       "effects_skipped": [
-        "flicker(intensity=0)",
-        "glow_drift(intensity=0)",
-        "vignette_pulse(intensity=0)"
+        {
+          "effect": "flicker(intensity=0)",
+          "reason": "unknown"
+        },
+        {
+          "effect": "glow_drift(intensity=0)",
+          "reason": "unknown"
+        },
+        {
+          "effect": "vignette_pulse(intensity=0)",
+          "reason": "unknown"
+        }
       ],
       "degraded_mode_used": false,
-      "ffmpeg_rc": -1,
-      "passed": true,
-      "validation_ts": "2026-03-31T06:29:07.267346"
+      "render_status": "success",
+      "error": null,
+      "ffmpeg_rc": null,
+      "cmd_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_suspense.ffmpeg.cmd.txt",
+      "stderr_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_suspense.ffmpeg.stderr.log",
+      "render_log": [
+        "[06:44:26] \ud83c\udfac file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+        "[06:44:26]    Preset: suspense | 1080\u00d71920 | 5.0s",
+        "[06:44:26]   Mode: static (direct FFmpeg)",
+        "[06:44:26]   Effects: applied=[] skipped=['flicker(intensity=0)', 'glow_drift(intensity=0)', 'vignette_pulse(intensity=0)']",
+        "[06:44:26]   \u2705 validation_suspense.mp4 \u2014 0.10MB | 0.7s"
+      ]
     },
     {
       "preset_name": "heartbreak",
-      "schema_status": "old_schema",
+      "schema_status": "old",
+      "engine_mode": "static_ffmpeg",
       "route_selected": "static_ffmpeg",
-      "render_status": "success",
-      "render_time_sec": 0.69,
-      "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_heartbreak.mp4",
-      "file_size_mb": 0.1019,
+      "status": "success",
+      "validation_status": "degraded_pass",
+      "render_time_sec": 0.7,
+      "output_path": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_heartbreak.mp4",
+      "file_size_mb": 0.1,
+      "duration_sec": 5.0,
+      "fps": 24,
+      "resolution": "1080\u00d71920",
+      "source_image": "/Users/monsterlee/.openclaw/media/inbound/file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+      "source_frame_extracted_from_video": null,
+      "timeline_applied": {
+        "hold_start_sec": 0.0,
+        "main_move_start_sec": 0.0,
+        "main_move_end_sec": 5.0,
+        "hold_end_sec": 0.0
+      },
+      "camera_params_applied": {
+        "move": "static",
+        "zoom_start": 1.0,
+        "zoom_end": 1.0,
+        "x_start": 0.5,
+        "x_end": 0.5,
+        "y_start": 0.5,
+        "y_end": 0.5,
+        "rotation_start_deg": 0.0,
+        "rotation_end_deg": 0.0,
+        "easing": "linear"
+      },
       "effects_requested": [],
       "effects_applied": [],
       "effects_skipped": [
-        "flicker(intensity=0)",
-        "glow_drift(intensity=0)",
-        "vignette_pulse(intensity=0)"
+        {
+          "effect": "flicker(intensity=0)",
+          "reason": "unknown"
+        },
+        {
+          "effect": "glow_drift(intensity=0)",
+          "reason": "unknown"
+        },
+        {
+          "effect": "vignette_pulse(intensity=0)",
+          "reason": "unknown"
+        }
       ],
       "degraded_mode_used": false,
-      "ffmpeg_rc": -1,
-      "passed": true,
-      "validation_ts": "2026-03-31T06:29:07.956393"
+      "render_status": "success",
+      "error": null,
+      "ffmpeg_rc": null,
+      "cmd_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_heartbreak.ffmpeg.cmd.txt",
+      "stderr_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_heartbreak.ffmpeg.stderr.log",
+      "render_log": [
+        "[06:44:26] \ud83c\udfac file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+        "[06:44:26]    Preset: heartbreak | 1080\u00d71920 | 5.0s",
+        "[06:44:26]   Mode: static (direct FFmpeg)",
+        "[06:44:26]   Effects: applied=[] skipped=['flicker(intensity=0)', 'glow_drift(intensity=0)', 'vignette_pulse(intensity=0)']",
+        "[06:44:27]   \u2705 validation_heartbreak.mp4 \u2014 0.10MB | 0.7s"
+      ]
     },
     {
       "preset_name": "reveal",
-      "schema_status": "old_schema",
+      "schema_status": "old",
+      "engine_mode": "static_ffmpeg",
       "route_selected": "static_ffmpeg",
-      "render_status": "success",
-      "render_time_sec": 0.68,
-      "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_reveal.mp4",
-      "file_size_mb": 0.1019,
+      "status": "success",
+      "validation_status": "degraded_pass",
+      "render_time_sec": 0.7,
+      "output_path": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_reveal.mp4",
+      "file_size_mb": 0.1,
+      "duration_sec": 5.0,
+      "fps": 24,
+      "resolution": "1080\u00d71920",
+      "source_image": "/Users/monsterlee/.openclaw/media/inbound/file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+      "source_frame_extracted_from_video": null,
+      "timeline_applied": {
+        "hold_start_sec": 0.0,
+        "main_move_start_sec": 0.0,
+        "main_move_end_sec": 5.0,
+        "hold_end_sec": 0.0
+      },
+      "camera_params_applied": {
+        "move": "static",
+        "zoom_start": 1.0,
+        "zoom_end": 1.0,
+        "x_start": 0.5,
+        "x_end": 0.5,
+        "y_start": 0.5,
+        "y_end": 0.5,
+        "rotation_start_deg": 0.0,
+        "rotation_end_deg": 0.0,
+        "easing": "linear"
+      },
       "effects_requested": [],
       "effects_applied": [],
       "effects_skipped": [
-        "flicker(intensity=0)",
-        "glow_drift(intensity=0)",
-        "vignette_pulse(intensity=0)"
+        {
+          "effect": "flicker(intensity=0)",
+          "reason": "unknown"
+        },
+        {
+          "effect": "glow_drift(intensity=0)",
+          "reason": "unknown"
+        },
+        {
+          "effect": "vignette_pulse(intensity=0)",
+          "reason": "unknown"
+        }
       ],
       "degraded_mode_used": false,
-      "ffmpeg_rc": -1,
-      "passed": true,
-      "validation_ts": "2026-03-31T06:29:08.635187"
+      "render_status": "success",
+      "error": null,
+      "ffmpeg_rc": null,
+      "cmd_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_reveal.ffmpeg.cmd.txt",
+      "stderr_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_reveal.ffmpeg.stderr.log",
+      "render_log": [
+        "[06:44:27] \ud83c\udfac file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+        "[06:44:27]    Preset: reveal | 1080\u00d71920 | 5.0s",
+        "[06:44:27]   Mode: static (direct FFmpeg)",
+        "[06:44:27]   Effects: applied=[] skipped=['flicker(intensity=0)', 'glow_drift(intensity=0)', 'vignette_pulse(intensity=0)']",
+        "[06:44:28]   \u2705 validation_reveal.mp4 \u2014 0.10MB | 0.7s"
+      ]
     },
     {
       "preset_name": "comedy",
-      "schema_status": "old_schema",
+      "schema_status": "old",
+      "engine_mode": "static_ffmpeg",
       "route_selected": "static_ffmpeg",
-      "render_status": "success",
-      "render_time_sec": 0.68,
-      "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_comedy.mp4",
-      "file_size_mb": 0.1019,
+      "status": "success",
+      "validation_status": "degraded_pass",
+      "render_time_sec": 0.7,
+      "output_path": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_comedy.mp4",
+      "file_size_mb": 0.1,
+      "duration_sec": 5.0,
+      "fps": 24,
+      "resolution": "1080\u00d71920",
+      "source_image": "/Users/monsterlee/.openclaw/media/inbound/file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+      "source_frame_extracted_from_video": null,
+      "timeline_applied": {
+        "hold_start_sec": 0.0,
+        "main_move_start_sec": 0.0,
+        "main_move_end_sec": 5.0,
+        "hold_end_sec": 0.0
+      },
+      "camera_params_applied": {
+        "move": "static",
+        "zoom_start": 1.0,
+        "zoom_end": 1.0,
+        "x_start": 0.5,
+        "x_end": 0.5,
+        "y_start": 0.5,
+        "y_end": 0.5,
+        "rotation_start_deg": 0.0,
+        "rotation_end_deg": 0.0,
+        "easing": "linear"
+      },
       "effects_requested": [],
       "effects_applied": [],
       "effects_skipped": [
-        "flicker(intensity=0)",
-        "glow_drift(intensity=0)",
-        "vignette_pulse(intensity=0)"
+        {
+          "effect": "flicker(intensity=0)",
+          "reason": "unknown"
+        },
+        {
+          "effect": "glow_drift(intensity=0)",
+          "reason": "unknown"
+        },
+        {
+          "effect": "vignette_pulse(intensity=0)",
+          "reason": "unknown"
+        }
       ],
       "degraded_mode_used": false,
-      "ffmpeg_rc": -1,
-      "passed": true,
-      "validation_ts": "2026-03-31T06:29:09.320987"
+      "render_status": "success",
+      "error": null,
+      "ffmpeg_rc": null,
+      "cmd_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_comedy.ffmpeg.cmd.txt",
+      "stderr_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_comedy.ffmpeg.stderr.log",
+      "render_log": [
+        "[06:44:28] \ud83c\udfac file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+        "[06:44:28]    Preset: comedy | 1080\u00d71920 | 5.0s",
+        "[06:44:28]   Mode: static (direct FFmpeg)",
+        "[06:44:28]   Effects: applied=[] skipped=['flicker(intensity=0)', 'glow_drift(intensity=0)', 'vignette_pulse(intensity=0)']",
+        "[06:44:29]   \u2705 validation_comedy.mp4 \u2014 0.10MB | 0.7s"
+      ]
     },
     {
       "preset_name": "suspense_push",
-      "schema_status": "new_schema",
-      "route_selected": "cinematic_pil",
-      "render_status": "success",
-      "render_time_sec": 5.37,
-      "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_suspense_push.mp4",
-      "file_size_mb": 0.3753,
+      "schema_status": "new",
+      "engine_mode": "pil",
+      "route_selected": "pil",
+      "status": "success",
+      "validation_status": "pass",
+      "render_time_sec": 5.5,
+      "output_path": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_suspense_push.mp4",
+      "file_size_mb": 0.38,
+      "duration_sec": 5.0,
+      "fps": 24,
+      "resolution": "1080\u00d71920",
+      "source_image": "/Users/monsterlee/.openclaw/media/inbound/file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+      "source_frame_extracted_from_video": null,
+      "timeline_applied": {
+        "hold_start_sec": 1.2,
+        "main_move_start_sec": 1.2,
+        "main_move_end_sec": 4.0,
+        "hold_end_sec": 1.0
+      },
+      "camera_params_applied": {
+        "move": "push_in",
+        "zoom_start": 1.0,
+        "zoom_end": 1.12,
+        "x_start": 0.5,
+        "x_end": 0.5,
+        "y_start": 0.5,
+        "y_end": 0.5,
+        "rotation_start_deg": 0.0,
+        "rotation_end_deg": 0.1,
+        "easing": "ease_in_out"
+      },
       "effects_requested": [
-        "micro_shake(0.006)",
-        "breathing(0.005)",
-        "flicker(0.02)",
-        "glow_drift(0.03)",
-        "vignette_pulse(0.06)",
-        "flicker(intensity=0.02)",
-        "glow_drift(intensity=0.03)",
-        "vignette_pulse(intensity=0.06)"
+        [
+          "micro_shake",
+          "breathing",
+          "flicker",
+          "vignette_pulse",
+          "glow_drift"
+        ]
       ],
       "effects_applied": [
         "flicker(0.02)",
@@ -110,52 +306,122 @@
       ],
       "effects_skipped": [],
       "degraded_mode_used": false,
-      "ffmpeg_rc": -1,
-      "passed": true,
-      "validation_ts": "2026-03-31T06:29:14.692547"
+      "render_status": "success",
+      "error": null,
+      "ffmpeg_rc": null,
+      "cmd_file": null,
+      "stderr_file": null,
+      "render_log": [
+        "[06:44:29] \ud83c\udfac file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+        "[06:44:29]    Preset: suspense_push | 1080\u00d71920 | 5.0s",
+        "[06:44:29]   Mode: cinematic motion (PIL per-frame)"
+      ]
     },
     {
       "preset_name": "heartbreak_drift",
-      "schema_status": "new_schema",
-      "route_selected": "cinematic_pil",
-      "render_status": "success",
-      "render_time_sec": 5.05,
-      "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_heartbreak_drift.mp4",
-      "file_size_mb": 0.327,
+      "schema_status": "new",
+      "engine_mode": "pil",
+      "route_selected": "pil",
+      "status": "success",
+      "validation_status": "degraded_pass",
+      "render_time_sec": 5.2,
+      "output_path": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_heartbreak_drift.mp4",
+      "file_size_mb": 0.33,
+      "duration_sec": 5.0,
+      "fps": 24,
+      "resolution": "1080\u00d71920",
+      "source_image": "/Users/monsterlee/.openclaw/media/inbound/file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+      "source_frame_extracted_from_video": null,
+      "timeline_applied": {
+        "hold_start_sec": 0.4,
+        "main_move_start_sec": 0.4,
+        "main_move_end_sec": 4.6,
+        "hold_end_sec": 0.4
+      },
+      "camera_params_applied": {
+        "move": "pull_out",
+        "zoom_start": 1.0,
+        "zoom_end": 0.91,
+        "x_start": 0.5,
+        "x_end": 0.5,
+        "y_start": 0.5,
+        "y_end": 0.5,
+        "rotation_start_deg": 0.0,
+        "rotation_end_deg": -0.15,
+        "easing": "ease_in"
+      },
       "effects_requested": [
-        "breathing(0.012)",
-        "vignette_pulse(0.04)",
-        "vignette_pulse(intensity=0.04)"
+        [
+          "breathing",
+          "vignette_pulse"
+        ]
       ],
       "effects_applied": [
         "vignette_pulse(0.04)"
       ],
       "effects_skipped": [
-        "flicker(intensity=0)",
-        "glow_drift(intensity=0)"
+        {
+          "effect": "flicker(intensity=0)",
+          "reason": "unknown"
+        },
+        {
+          "effect": "glow_drift(intensity=0)",
+          "reason": "unknown"
+        }
       ],
-      "degraded_mode_used": false,
-      "ffmpeg_rc": -1,
-      "passed": true,
-      "validation_ts": "2026-03-31T06:29:19.739326"
+      "degraded_mode_used": true,
+      "render_status": "success",
+      "error": null,
+      "ffmpeg_rc": null,
+      "cmd_file": null,
+      "stderr_file": null,
+      "render_log": [
+        "[06:44:34] \ud83c\udfac file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+        "[06:44:34]    Preset: heartbreak_drift | 1080\u00d71920 | 5.0s",
+        "[06:44:34]   Mode: cinematic motion (PIL per-frame)"
+      ]
     },
     {
       "preset_name": "reveal_hold_push",
-      "schema_status": "new_schema",
-      "route_selected": "cinematic_pil",
-      "render_status": "success",
-      "render_time_sec": 5.31,
-      "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_reveal_hold_push.mp4",
-      "file_size_mb": 0.3911,
+      "schema_status": "new",
+      "engine_mode": "pil",
+      "route_selected": "pil",
+      "status": "success",
+      "validation_status": "pass",
+      "render_time_sec": 5.5,
+      "output_path": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_reveal_hold_push.mp4",
+      "file_size_mb": 0.39,
+      "duration_sec": 5.0,
+      "fps": 24,
+      "resolution": "1080\u00d71920",
+      "source_image": "/Users/monsterlee/.openclaw/media/inbound/file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+      "source_frame_extracted_from_video": null,
+      "timeline_applied": {
+        "hold_start_sec": 1.8,
+        "main_move_start_sec": 1.8,
+        "main_move_end_sec": 4.2,
+        "hold_end_sec": 0.8
+      },
+      "camera_params_applied": {
+        "move": "push_in",
+        "zoom_start": 1.0,
+        "zoom_end": 1.15,
+        "x_start": 0.5,
+        "x_end": 0.5,
+        "y_start": 0.5,
+        "y_end": 0.5,
+        "rotation_start_deg": 0.0,
+        "rotation_end_deg": 0.25,
+        "easing": "ease_out"
+      },
       "effects_requested": [
-        "micro_shake(0.008)",
-        "breathing(0.004)",
-        "flicker(0.04)",
-        "glow_drift(0.06)",
-        "vignette_pulse(0.03)",
-        "flicker(intensity=0.04)",
-        "glow_drift(intensity=0.06)",
-        "vignette_pulse(intensity=0.03)"
+        [
+          "micro_shake",
+          "breathing",
+          "flicker",
+          "vignette_pulse",
+          "glow_drift"
+        ]
       ],
       "effects_applied": [
         "flicker(0.04)",
@@ -164,83 +430,207 @@
       ],
       "effects_skipped": [],
       "degraded_mode_used": false,
-      "ffmpeg_rc": -1,
-      "passed": true,
-      "validation_ts": "2026-03-31T06:29:25.047251"
+      "render_status": "success",
+      "error": null,
+      "ffmpeg_rc": null,
+      "cmd_file": null,
+      "stderr_file": null,
+      "render_log": [
+        "[06:44:39] \ud83c\udfac file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+        "[06:44:39]    Preset: reveal_hold_push | 1080\u00d71920 | 5.0s",
+        "[06:44:39]   Mode: cinematic motion (PIL per-frame)"
+      ]
     },
     {
       "preset_name": "comedy_snap",
-      "schema_status": "new_schema",
-      "route_selected": "cinematic_pil",
-      "render_status": "success",
-      "render_time_sec": 3.63,
-      "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_comedy_snap.mp4",
-      "file_size_mb": 0.189,
+      "schema_status": "new",
+      "engine_mode": "pil",
+      "route_selected": "pil",
+      "status": "success",
+      "validation_status": "degraded_pass",
+      "render_time_sec": 3.7,
+      "output_path": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_comedy_snap.mp4",
+      "file_size_mb": 0.19,
+      "duration_sec": 3.5,
+      "fps": 24,
+      "resolution": "1080\u00d71920",
+      "source_image": "/Users/monsterlee/.openclaw/media/inbound/file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+      "source_frame_extracted_from_video": null,
+      "timeline_applied": {
+        "hold_start_sec": 1.0,
+        "main_move_start_sec": 1.5,
+        "main_move_end_sec": 2.0,
+        "hold_end_sec": 1.5
+      },
+      "camera_params_applied": {
+        "move": "static",
+        "zoom_start": 1.0,
+        "zoom_end": 1.015,
+        "x_start": 0.5,
+        "x_end": 0.5,
+        "y_start": 0.5,
+        "y_end": 0.5,
+        "rotation_start_deg": 0.0,
+        "rotation_end_deg": 0.0,
+        "easing": "ease_in_out"
+      },
       "effects_requested": [
-        "breathing(0.006)"
+        [
+          "breathing"
+        ]
       ],
       "effects_applied": [],
       "effects_skipped": [
-        "flicker(intensity=0)",
-        "glow_drift(intensity=0)",
-        "vignette_pulse(intensity=0)"
+        {
+          "effect": "flicker(intensity=0)",
+          "reason": "unknown"
+        },
+        {
+          "effect": "glow_drift(intensity=0)",
+          "reason": "unknown"
+        },
+        {
+          "effect": "vignette_pulse(intensity=0)",
+          "reason": "unknown"
+        }
       ],
-      "degraded_mode_used": false,
-      "ffmpeg_rc": -1,
-      "passed": true,
-      "validation_ts": "2026-03-31T06:29:28.679458"
+      "degraded_mode_used": true,
+      "render_status": "success",
+      "error": null,
+      "ffmpeg_rc": null,
+      "cmd_file": null,
+      "stderr_file": null,
+      "render_log": [
+        "[06:44:45] \ud83c\udfac file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+        "[06:44:45]    Preset: comedy_snap | 1080\u00d71920 | 3.5s",
+        "[06:44:45]   Mode: cinematic motion (PIL per-frame)"
+      ]
     },
     {
       "preset_name": "confrontation_shake",
-      "schema_status": "new_schema",
-      "route_selected": "cinematic_pil",
-      "render_status": "success",
-      "render_time_sec": 4.88,
-      "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_confrontation_shake.mp4",
-      "file_size_mb": 0.2822,
+      "schema_status": "new",
+      "engine_mode": "pil",
+      "route_selected": "pil",
+      "status": "success",
+      "validation_status": "degraded_pass",
+      "render_time_sec": 4.8,
+      "output_path": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_confrontation_shake.mp4",
+      "file_size_mb": 0.28,
+      "duration_sec": 4.5,
+      "fps": 24,
+      "resolution": "1080\u00d71920",
+      "source_image": "/Users/monsterlee/.openclaw/media/inbound/file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+      "source_frame_extracted_from_video": null,
+      "timeline_applied": {
+        "hold_start_sec": 0.2,
+        "main_move_start_sec": 0.2,
+        "main_move_end_sec": 3.5,
+        "hold_end_sec": 1.0
+      },
+      "camera_params_applied": {
+        "move": "shake",
+        "zoom_start": 1.0,
+        "zoom_end": 1.06,
+        "x_start": 0.5,
+        "x_end": 0.52,
+        "y_start": 0.5,
+        "y_end": 0.49,
+        "rotation_start_deg": 0.0,
+        "rotation_end_deg": 0.2,
+        "easing": "ease_out"
+      },
       "effects_requested": [
-        "micro_shake(0.022)",
-        "flicker(0.03)",
-        "vignette_pulse(0.05)",
-        "flicker(intensity=0.03)",
-        "vignette_pulse(intensity=0.05)"
+        [
+          "micro_shake",
+          "flicker",
+          "vignette_pulse"
+        ]
       ],
       "effects_applied": [
         "flicker(0.03)",
         "vignette_pulse(0.05)"
       ],
       "effects_skipped": [
-        "glow_drift(intensity=0)"
+        {
+          "effect": "glow_drift(intensity=0)",
+          "reason": "unknown"
+        }
       ],
-      "degraded_mode_used": false,
-      "ffmpeg_rc": -1,
-      "passed": true,
-      "validation_ts": "2026-03-31T06:29:33.561411"
+      "degraded_mode_used": true,
+      "render_status": "success",
+      "error": null,
+      "ffmpeg_rc": null,
+      "cmd_file": null,
+      "stderr_file": null,
+      "render_log": [
+        "[06:44:48] \ud83c\udfac file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+        "[06:44:48]    Preset: confrontation_shake | 1080\u00d71920 | 4.5s",
+        "[06:44:48]   Mode: cinematic motion (PIL per-frame)"
+      ]
     },
     {
       "preset_name": "memory_float",
-      "schema_status": "new_schema",
-      "route_selected": "cinematic_pil",
-      "render_status": "success",
-      "render_time_sec": 6.17,
-      "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_memory_float.mp4",
-      "file_size_mb": 0.4489,
+      "schema_status": "new",
+      "engine_mode": "pil",
+      "route_selected": "pil",
+      "status": "success",
+      "validation_status": "degraded_pass",
+      "render_time_sec": 6.4,
+      "output_path": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_memory_float.mp4",
+      "file_size_mb": 0.45,
+      "duration_sec": 6.0,
+      "fps": 24,
+      "resolution": "1080\u00d71920",
+      "source_image": "/Users/monsterlee/.openclaw/media/inbound/file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+      "source_frame_extracted_from_video": null,
+      "timeline_applied": {
+        "hold_start_sec": 0.8,
+        "main_move_start_sec": 0.8,
+        "main_move_end_sec": 5.2,
+        "hold_end_sec": 0.8
+      },
+      "camera_params_applied": {
+        "move": "push_in",
+        "zoom_start": 1.0,
+        "zoom_end": 1.06,
+        "x_start": 0.48,
+        "x_end": 0.52,
+        "y_start": 0.52,
+        "y_end": 0.48,
+        "rotation_start_deg": -0.2,
+        "rotation_end_deg": 0.2,
+        "easing": "ease_in_out"
+      },
       "effects_requested": [
-        "breathing(0.015)",
-        "glow_drift(0.05)",
-        "glow_drift(intensity=0.05)"
+        [
+          "breathing",
+          "glow_drift"
+        ]
       ],
       "effects_applied": [
         "glow_drift(0.05)"
       ],
       "effects_skipped": [
-        "flicker(intensity=0)",
-        "vignette_pulse(intensity=0)"
+        {
+          "effect": "flicker(intensity=0)",
+          "reason": "unknown"
+        },
+        {
+          "effect": "vignette_pulse(intensity=0)",
+          "reason": "unknown"
+        }
       ],
-      "degraded_mode_used": false,
-      "ffmpeg_rc": -1,
-      "passed": true,
-      "validation_ts": "2026-03-31T06:29:39.736646"
+      "degraded_mode_used": true,
+      "render_status": "success",
+      "error": null,
+      "ffmpeg_rc": null,
+      "cmd_file": null,
+      "stderr_file": null,
+      "render_log": [
+        "[06:44:53] \ud83c\udfac file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+        "[06:44:53]    Preset: memory_float | 1080\u00d71920 | 6.0s",
+        "[06:44:53]   Mode: cinematic motion (PIL per-frame)"
+      ]
     }
   ]
 }

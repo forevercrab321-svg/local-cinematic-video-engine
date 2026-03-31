@@ -51,120 +51,6 @@ class CinematicShotEngine:
                 return p
         return "ffmpeg"
 
-
-    # ── SCHEMA DETECTION ────────────────────────────────────────
-    OLD_SCHEMA_KEYS  = {"camera_moves", "effects", "parallax"}
-    # Strict new schema keys — NOT name/description/fps/duration_sec
-    NEW_SCHEMA_CORE  = {"camera", "motion", "lighting", "timing"}
-
-    def _detect_schema_status(self, preset_data: dict) -> str:
-        """Detect schema status from raw preset data dict.
-        
-        Rules:
-        - Has camera_moves/effects/parallax (old keys) → 'old'
-        - Has camera/motion/lighting/timing (new keys) → 'new'
-        - Has both → 'mixed'
-        - Has neither → 'invalid'
-        """
-        keys = set(preset_data.keys())
-        has_old = bool(keys & self.OLD_SCHEMA_KEYS)
-        has_new = bool(keys & self.NEW_SCHEMA_CORE)
-        if has_old and has_new:
-            return "mixed"
-        elif has_old:
-            return "old"
-        elif has_new:
-            return "new"
-        return "invalid"
-
-    def _compute_validation_status(
-        self, schema_status: str, render_status: str,
-        degraded_used: bool
-    ) -> str:
-        """Compute validation_status per RENDER_RESULT_CONTRACT."""
-        if render_status == "success":
-            if schema_status == "new":
-                return "pass" if not degraded_used else "degraded_pass"
-            elif schema_status == "old":
-                return "degraded_pass"
-            else:
-                return "fail"
-        return "fail"
-
-    def _enrich_result(
-        self, result: dict, preset, actual_input: str,
-        cmd_file: Path|None, stderr_file: Path|None,
-        degraded_used: bool
-    ) -> dict:
-        """Add all contract-required fields to a result dict."""
-        from copy import deepcopy
-        r = deepcopy(result)
-
-        schema_status = self._detect_schema_status(preset._d)
-
-        r.setdefault("preset_name",     preset.name)
-        r.setdefault("schema_status",  schema_status)
-        r.setdefault("engine_mode",     r.get("method", "unknown"))
-        r.setdefault("route_selected", r.get("method", "unknown"))
-        r.setdefault("source_image",    actual_input)
-        r.setdefault("source_frame_extracted_from_video", None)
-        r.setdefault("render_time_sec", 0.0)
-        r.setdefault("degraded_mode_used", degraded_used)
-        r.setdefault("validation_status",
-                     self._compute_validation_status(
-                         schema_status,
-                         r.get("status", "failed"),
-                         degraded_used))
-        if cmd_file and r.get("status") == "success":
-            r["cmd_file"] = str(cmd_file)
-        else:
-            r.setdefault("cmd_file", None)
-        if stderr_file and r.get("status") == "success":
-            r["stderr_file"] = str(stderr_file)
-        else:
-            r.setdefault("stderr_file", None)
-
-        # Normalise effects_skipped strings → SkipEntry objects
-        raw_sk = r.get("effects_skipped", [])
-        normalised = []
-        for item in raw_sk:
-            if isinstance(item, str):
-                if ": intensity=" in item:
-                    # zero-intensity skip
-                    name = item.split("(")[0].strip()
-                    normalised.append({"effect": name, "reason": "intensity=0"})
-                elif item in ("breathing", "micro_shake", "flicker",
-                              "glow_drift", "vignette_pulse"):
-                    normalised.append({"effect": item, "reason": "route_unsupported"})
-                else:
-                    normalised.append({"effect": item, "reason": "unknown"})
-            else:
-                normalised.append(item)
-        r["effects_skipped"] = normalised
-
-        # Normalise effects_requested format
-        req = r.get("effects_requested", [])
-        if req and isinstance(req[0], str) and "(" not in req[0]:
-            norm_req = []
-            for e in req:
-                if e == "camera_move":
-                    norm_req.append(f"camera_move(z{getattr(preset,'zoom_start','?')}→{getattr(preset,'zoom_end','?')})")
-                elif e == "micro_shake":
-                    norm_req.append(f"micro_shake({getattr(preset,'micro_shake',0)})")
-                elif e == "breathing":
-                    norm_req.append(f"breathing({getattr(preset,'breathing',0)})")
-                elif e == "flicker":
-                    norm_req.append(f"flicker({getattr(preset,'flicker',0)})")
-                elif e == "glow_drift":
-                    norm_req.append(f"glow_drift({getattr(preset,'glow_drift',0)})")
-                elif e == "vignette_pulse":
-                    norm_req.append(f"vignette_pulse({getattr(preset,'vignette_pulse',0)})")
-                else:
-                    norm_req.append(e)
-            r["effects_requested"] = norm_req
-
-        return r
-
     @property
     def motion(self):
         if self._motion is None:
@@ -396,8 +282,6 @@ class CinematicShotEngine:
                 "effects_skipped": effects_skipped,
             }
 
-            # static path: micro_shake/breathing skipped by design
-            degraded = bool(preset.micro_shake > 0 or preset.breathing > 0)
             if result.returncode == 0 and out_path.exists():
                 size_mb = out_path.stat().st_size / (1024 * 1024)
                 self._log(f"  ✅ {out_path.name} — {size_mb:.2f}MB | {elapsed:.1f}s")
@@ -406,7 +290,7 @@ class CinematicShotEngine:
                     "status": "success",
                     "output_path": str(out_path),
                     "file_size_mb": round(size_mb, 2),
-                    "duration_sec": actual_duration,
+                    "duration": actual_duration,
                     "render_time_sec": round(elapsed, 1),
                     "camera_intensity": camera_intensity,
                     "resolution": f"{width}×{height}",
@@ -415,9 +299,6 @@ class CinematicShotEngine:
                     "lighting_vf": ",".join(vf_parts) if vf_parts else None,
                     "render_log": self._log_entries,
                 }
-                final_result = self._enrich_result(
-                    final_result, preset, actual_input,
-                    cmd_file, stderr_file, degraded)
             else:
                 self._log(f"  ❌ RC={result.returncode}")
                 final_result = {
@@ -427,14 +308,7 @@ class CinematicShotEngine:
                     "render_time_sec": round(elapsed, 1),
                     "method": "static_ffmpeg",
                     "render_log": self._log_entries,
-                    "output_path": None,
-                    "file_size_mb": None,
-                    "duration_sec": actual_duration,
                 }
-                final_result = self._enrich_result(
-                    final_result, preset, actual_input,
-                    cmd_file, stderr_file,
-                    bool(preset.breathing > 0 or preset.micro_shake > 0))
 
         elif self.motion._can_use_zoompan(preset):
             # === PATH 2: ZOOMPAN ===
@@ -476,7 +350,6 @@ class CinematicShotEngine:
                 "effects_skipped": ["breathing", "micro_shake", "flicker", "glow_drift", "vignette_pulse"],
             }
 
-            degraded = True  # zoompan skips micro_shake/breathing
             if result.returncode == 0 and out_path.exists():
                 size_mb = out_path.stat().st_size / (1024 * 1024)
                 self._log(f"  ✅ {out_path.name} — {size_mb:.2f}MB | {elapsed:.1f}s [zoompan]")
@@ -485,17 +358,14 @@ class CinematicShotEngine:
                     "status": "success",
                     "output_path": str(out_path),
                     "file_size_mb": round(size_mb, 2),
-                    "duration_sec": actual_duration,
+                    "duration": actual_duration,
                     "render_time_sec": round(elapsed, 1),
                     "fps": actual_fps,
                     "resolution": f"{width}×{height}",
-                    "method": "simple_zoompan_ffmpeg",
+                    "method": "zoompan",
                     "effects_applied": [],
                     "render_log": self._log_entries,
                 }
-                final_result = self._enrich_result(
-                    final_result, preset, actual_input,
-                    cmd_file, stderr_file, degraded)
             else:
                 self._log(f"  ⚠️  zoompan failed RC={result.returncode}, falling back to PIL")
                 result = self.motion.render(
@@ -512,10 +382,6 @@ class CinematicShotEngine:
                 result["render_time_sec"] = round(elapsed, 1)
                 result["preset"] = preset.name
                 result["render_log"] = self._log_entries
-                result["duration_sec"] = result.get("duration", actual_duration)
-                result = self._enrich_result(
-                    result, preset, actual_input,
-                    None, None, True)  # True: zoompan→PIL fallback = degraded
                 return result
 
         else:
@@ -559,14 +425,6 @@ class CinematicShotEngine:
                 "effects_applied": effects_applied,
                 "effects_skipped": effects_skipped,
             }
-            # degraded_mode_used = effects were approximated/skipped in this route
-            # (not: "breathing is above optimal threshold" — that's a separate quality concern)
-            pil_effects_applied = result.get("effects_applied", [])
-            pil_effects_skipped = result.get("effects_skipped", [])
-            degraded = (
-                len(pil_effects_skipped) > 0  # some effects couldn't be applied
-                or result.get("method") == "simple_zoompan_ffmpeg"  # fell back to zoompan
-            )
             final_result = {
                 **manifest_base,
                 **result,
@@ -575,11 +433,7 @@ class CinematicShotEngine:
                 "resolution": f"{width}×{height}",
                 "render_time_sec": round(elapsed, 1),
                 "render_log": self._log_entries,
-                "duration_sec": result.get("duration", actual_duration),
             }
-            final_result = self._enrich_result(
-                final_result, preset, actual_input,
-                None, None, degraded)
 
         return final_result
 
