@@ -1,0 +1,39 @@
+{
+  "name": "confrontation_shake",
+  "description": "Handheld tremor. Unresolved conflict. Camera can't settle.",
+  "duration_sec": 4.5,
+  "fps": 24,
+  "aspect_ratio": "9:16",
+  "camera": {
+    "move": "shake",
+    "zoom_start": 1.0,
+    "zoom_end": 1.14,
+    "x_start": 0.5,
+    "x_end": 0.52,
+    "y_start": 0.5,
+    "y_end": 0.49,
+    "rotation_start_deg": 0.0,
+    "rotation_end_deg": 0.2,
+    "easing": "ease_out"
+  },
+  "motion": {
+    "micro_shake": 0.025,
+    "breathing": 0.0,
+    "parallax_strength": 0.0
+  },
+  "lighting": {
+    "flicker": 0.03,
+    "vignette_pulse": 0.05,
+    "glow_drift": 0.0
+  },
+  "timing": {
+    "hold_start_sec": 0.3,
+    "main_move_start_sec": 0.3,
+    "main_move_end_sec": 3.5,
+    "hold_end_sec": 1.0
+  },
+  "output": {
+    "codec": "h264",
+    "pix_fmt": "yuv420p"
+  }
+}
