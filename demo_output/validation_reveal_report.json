@@ -1,0 +1,20 @@
+{
+  "preset_name": "reveal",
+  "schema_status": "old_schema",
+  "route_selected": "unknown",
+  "render_status": "success",
+  "render_time_sec": 0.68,
+  "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_reveal.mp4",
+  "file_size_mb": 0.1019,
+  "effects_requested": [],
+  "effects_applied": [],
+  "effects_skipped": [
+    "flicker(intensity=0)",
+    "glow_drift(intensity=0)",
+    "vignette_pulse(intensity=0)"
+  ],
+  "degraded_mode_used": false,
+  "ffmpeg_rc": -1,
+  "passed": true,
+  "validation_ts": "2026-03-31T06:29:08.635187"
+}

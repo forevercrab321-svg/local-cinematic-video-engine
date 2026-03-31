@@ -1,0 +1,29 @@
+{
+  "preset_name": "reveal_hold_push",
+  "schema_status": "new_schema",
+  "route_selected": "unknown",
+  "render_status": "success",
+  "render_time_sec": 5.31,
+  "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_reveal_hold_push.mp4",
+  "file_size_mb": 0.3911,
+  "effects_requested": [
+    "micro_shake(0.008)",
+    "breathing(0.004)",
+    "flicker(0.04)",
+    "glow_drift(0.06)",
+    "vignette_pulse(0.03)",
+    "flicker(intensity=0.04)",
+    "glow_drift(intensity=0.06)",
+    "vignette_pulse(intensity=0.03)"
+  ],
+  "effects_applied": [
+    "flicker(0.04)",
+    "glow_drift(0.06)",
+    "vignette_pulse(0.03)"
+  ],
+  "effects_skipped": [],
+  "degraded_mode_used": false,
+  "ffmpeg_rc": -1,
+  "passed": true,
+  "validation_ts": "2026-03-31T06:29:25.047251"
+}

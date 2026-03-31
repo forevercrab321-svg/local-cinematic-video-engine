@@ -1,0 +1,15 @@
+{
+  "preset_name": "suspense_push",
+  "stage": "D_full",
+  "failure_type": "",
+  "exact_failure_point": "",
+  "exact_failing_expression": "",
+  "ffmpeg_rc": 0,
+  "output_file": "demo_output/suspense_push_D_full.mp4",
+  "stderr_log": "",
+  "command_file": "demo_output/suspense_push_D_full.cmd.txt",
+  "params_file": "demo_output/suspense_push_D_full.params.json",
+  "notes": "",
+  "elapsed_sec": 5.35,
+  "pass": true
+}

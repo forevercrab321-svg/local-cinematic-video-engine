@@ -1,0 +1,15 @@
+{
+  "preset_name": "suspense_push",
+  "stage": "A_base",
+  "failure_type": "",
+  "exact_failure_point": "",
+  "exact_failing_expression": "",
+  "ffmpeg_rc": 0,
+  "output_file": "demo_output/suspense_push_A_base.mp4",
+  "stderr_log": "",
+  "command_file": "demo_output/suspense_push_A_base.cmd.txt",
+  "params_file": "demo_output/suspense_push_A_base.params.json",
+  "notes": "",
+  "elapsed_sec": 1.67,
+  "pass": true
+}

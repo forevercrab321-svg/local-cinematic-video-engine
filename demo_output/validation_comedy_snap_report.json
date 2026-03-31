@@ -1,0 +1,22 @@
+{
+  "preset_name": "comedy_snap",
+  "schema_status": "new_schema",
+  "route_selected": "unknown",
+  "render_status": "success",
+  "render_time_sec": 3.63,
+  "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_comedy_snap.mp4",
+  "file_size_mb": 0.189,
+  "effects_requested": [
+    "breathing(0.006)"
+  ],
+  "effects_applied": [],
+  "effects_skipped": [
+    "flicker(intensity=0)",
+    "glow_drift(intensity=0)",
+    "vignette_pulse(intensity=0)"
+  ],
+  "degraded_mode_used": false,
+  "ffmpeg_rc": -1,
+  "passed": true,
+  "validation_ts": "2026-03-31T06:29:28.679458"
+}

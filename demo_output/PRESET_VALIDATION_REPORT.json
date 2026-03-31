@@ -1,0 +1,246 @@
+{
+  "validation_ts": "2026-03-31T06:29:39.737145",
+  "total": 10,
+  "passed": 10,
+  "failed": 0,
+  "degraded": 0,
+  "results": [
+    {
+      "preset_name": "suspense",
+      "schema_status": "old_schema",
+      "route_selected": "static_ffmpeg",
+      "render_status": "success",
+      "render_time_sec": 0.67,
+      "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_suspense.mp4",
+      "file_size_mb": 0.1019,
+      "effects_requested": [],
+      "effects_applied": [],
+      "effects_skipped": [
+        "flicker(intensity=0)",
+        "glow_drift(intensity=0)",
+        "vignette_pulse(intensity=0)"
+      ],
+      "degraded_mode_used": false,
+      "ffmpeg_rc": -1,
+      "passed": true,
+      "validation_ts": "2026-03-31T06:29:07.267346"
+    },
+    {
+      "preset_name": "heartbreak",
+      "schema_status": "old_schema",
+      "route_selected": "static_ffmpeg",
+      "render_status": "success",
+      "render_time_sec": 0.69,
+      "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_heartbreak.mp4",
+      "file_size_mb": 0.1019,
+      "effects_requested": [],
+      "effects_applied": [],
+      "effects_skipped": [
+        "flicker(intensity=0)",
+        "glow_drift(intensity=0)",
+        "vignette_pulse(intensity=0)"
+      ],
+      "degraded_mode_used": false,
+      "ffmpeg_rc": -1,
+      "passed": true,
+      "validation_ts": "2026-03-31T06:29:07.956393"
+    },
+    {
+      "preset_name": "reveal",
+      "schema_status": "old_schema",
+      "route_selected": "static_ffmpeg",
+      "render_status": "success",
+      "render_time_sec": 0.68,
+      "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_reveal.mp4",
+      "file_size_mb": 0.1019,
+      "effects_requested": [],
+      "effects_applied": [],
+      "effects_skipped": [
+        "flicker(intensity=0)",
+        "glow_drift(intensity=0)",
+        "vignette_pulse(intensity=0)"
+      ],
+      "degraded_mode_used": false,
+      "ffmpeg_rc": -1,
+      "passed": true,
+      "validation_ts": "2026-03-31T06:29:08.635187"
+    },
+    {
+      "preset_name": "comedy",
+      "schema_status": "old_schema",
+      "route_selected": "static_ffmpeg",
+      "render_status": "success",
+      "render_time_sec": 0.68,
+      "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_comedy.mp4",
+      "file_size_mb": 0.1019,
+      "effects_requested": [],
+      "effects_applied": [],
+      "effects_skipped": [
+        "flicker(intensity=0)",
+        "glow_drift(intensity=0)",
+        "vignette_pulse(intensity=0)"
+      ],
+      "degraded_mode_used": false,
+      "ffmpeg_rc": -1,
+      "passed": true,
+      "validation_ts": "2026-03-31T06:29:09.320987"
+    },
+    {
+      "preset_name": "suspense_push",
+      "schema_status": "new_schema",
+      "route_selected": "cinematic_pil",
+      "render_status": "success",
+      "render_time_sec": 5.37,
+      "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_suspense_push.mp4",
+      "file_size_mb": 0.3753,
+      "effects_requested": [
+        "micro_shake(0.006)",
+        "breathing(0.005)",
+        "flicker(0.02)",
+        "glow_drift(0.03)",
+        "vignette_pulse(0.06)",
+        "flicker(intensity=0.02)",
+        "glow_drift(intensity=0.03)",
+        "vignette_pulse(intensity=0.06)"
+      ],
+      "effects_applied": [
+        "flicker(0.02)",
+        "glow_drift(0.03)",
+        "vignette_pulse(0.06)"
+      ],
+      "effects_skipped": [],
+      "degraded_mode_used": false,
+      "ffmpeg_rc": -1,
+      "passed": true,
+      "validation_ts": "2026-03-31T06:29:14.692547"
+    },
+    {
+      "preset_name": "heartbreak_drift",
+      "schema_status": "new_schema",
+      "route_selected": "cinematic_pil",
+      "render_status": "success",
+      "render_time_sec": 5.05,
+      "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_heartbreak_drift.mp4",
+      "file_size_mb": 0.327,
+      "effects_requested": [
+        "breathing(0.012)",
+        "vignette_pulse(0.04)",
+        "vignette_pulse(intensity=0.04)"
+      ],
+      "effects_applied": [
+        "vignette_pulse(0.04)"
+      ],
+      "effects_skipped": [
+        "flicker(intensity=0)",
+        "glow_drift(intensity=0)"
+      ],
+      "degraded_mode_used": false,
+      "ffmpeg_rc": -1,
+      "passed": true,
+      "validation_ts": "2026-03-31T06:29:19.739326"
+    },
+    {
+      "preset_name": "reveal_hold_push",
+      "schema_status": "new_schema",
+      "route_selected": "cinematic_pil",
+      "render_status": "success",
+      "render_time_sec": 5.31,
+      "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_reveal_hold_push.mp4",
+      "file_size_mb": 0.3911,
+      "effects_requested": [
+        "micro_shake(0.008)",
+        "breathing(0.004)",
+        "flicker(0.04)",
+        "glow_drift(0.06)",
+        "vignette_pulse(0.03)",
+        "flicker(intensity=0.04)",
+        "glow_drift(intensity=0.06)",
+        "vignette_pulse(intensity=0.03)"
+      ],
+      "effects_applied": [
+        "flicker(0.04)",
+        "glow_drift(0.06)",
+        "vignette_pulse(0.03)"
+      ],
+      "effects_skipped": [],
+      "degraded_mode_used": false,
+      "ffmpeg_rc": -1,
+      "passed": true,
+      "validation_ts": "2026-03-31T06:29:25.047251"
+    },
+    {
+      "preset_name": "comedy_snap",
+      "schema_status": "new_schema",
+      "route_selected": "cinematic_pil",
+      "render_status": "success",
+      "render_time_sec": 3.63,
+      "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_comedy_snap.mp4",
+      "file_size_mb": 0.189,
+      "effects_requested": [
+        "breathing(0.006)"
+      ],
+      "effects_applied": [],
+      "effects_skipped": [
+        "flicker(intensity=0)",
+        "glow_drift(intensity=0)",
+        "vignette_pulse(intensity=0)"
+      ],
+      "degraded_mode_used": false,
+      "ffmpeg_rc": -1,
+      "passed": true,
+      "validation_ts": "2026-03-31T06:29:28.679458"
+    },
+    {
+      "preset_name": "confrontation_shake",
+      "schema_status": "new_schema",
+      "route_selected": "cinematic_pil",
+      "render_status": "success",
+      "render_time_sec": 4.88,
+      "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_confrontation_shake.mp4",
+      "file_size_mb": 0.2822,
+      "effects_requested": [
+        "micro_shake(0.022)",
+        "flicker(0.03)",
+        "vignette_pulse(0.05)",
+        "flicker(intensity=0.03)",
+        "vignette_pulse(intensity=0.05)"
+      ],
+      "effects_applied": [
+        "flicker(0.03)",
+        "vignette_pulse(0.05)"
+      ],
+      "effects_skipped": [
+        "glow_drift(intensity=0)"
+      ],
+      "degraded_mode_used": false,
+      "ffmpeg_rc": -1,
+      "passed": true,
+      "validation_ts": "2026-03-31T06:29:33.561411"
+    },
+    {
+      "preset_name": "memory_float",
+      "schema_status": "new_schema",
+      "route_selected": "cinematic_pil",
+      "render_status": "success",
+      "render_time_sec": 6.17,
+      "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_memory_float.mp4",
+      "file_size_mb": 0.4489,
+      "effects_requested": [
+        "breathing(0.015)",
+        "glow_drift(0.05)",
+        "glow_drift(intensity=0.05)"
+      ],
+      "effects_applied": [
+        "glow_drift(0.05)"
+      ],
+      "effects_skipped": [
+        "flicker(intensity=0)",
+        "vignette_pulse(intensity=0)"
+      ],
+      "degraded_mode_used": false,
+      "ffmpeg_rc": -1,
+      "passed": true,
+      "validation_ts": "2026-03-31T06:29:39.736646"
+    }
+  ]
+}

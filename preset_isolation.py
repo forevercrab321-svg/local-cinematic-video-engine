@@ -1,436 +1,378 @@
 #!/usr/bin/env python3
 """
-Preset isolation debugger — suspense_push preset
+preset_isolation.py — Four-stage isolation debugger for cinematic presets.
 
-Tests 4 progressive layers to isolate exactly which part of the
-preset chain causes failure.
+Tests one preset in progressive layers to pinpoint where failures originate.
 
-A. base camera only (zoom, no easing/motion)
-B. base camera + motion (zoom + micro_shake/breathing)
-C. base camera + motion + lighting (adds effects)
-D. full preset with timing (hold windows, easing)
+RULES:
+  1. Any stage failure → subsequent stages STOP (no fallback, no silent continue)
+  2. All failures must be explicitly documented with exact failure point
+  3. OLD SCHEMA presets are NOT valid test subjects (silently map to static)
+  4. All output must be machine-readable (JSON)
+  5. No silent fallback — if something fails, it fails visibly
 
-Each stage outputs:
-  demo_output/suspense_{stage}_*.cmd.txt   — full ffmpeg command
-  demo_output/suspense_{stage}_*.stderr.log — full stderr
-  demo_output/suspense_{stage}_*.mp4      — output if pass
-  RC: N | PASS/FAIL
+STAGES:
+  A — Base camera only (linear zoom, no hold, no easing, no effects)
+  B — + Motion layer (micro_shake, breathing)
+  C — + Lighting layer (flicker, vignette_pulse, glow_drift)
+  D — Full preset with timing/easing/hold
+
+USAGE:
+  python3 preset_isolation.py suspense_push 5.0
+  python3 preset_isolation.py suspense_push 5.0 --stage A
 """
 
-import subprocess
-import shutil
-import os
-import math
-import tempfile
-import hashlib
+import subprocess, json, time, sys, tempfile, hashlib
 from pathlib import Path
-from PIL import Image
+from dataclasses import dataclass, field, asdict
+from typing import Optional
 
-SKILL_DIR = Path(__file__).parent
-DEMO = SKILL_DIR / "demo_output"
-DEMO.mkdir(exist_ok=True)
+sys.path.insert(0, str(Path(__file__).parent))
+from preset import load_preset
 
-FFMPEG = "/usr/local/bin/ffmpeg"
-IMAGE = str(SKILL_DIR / "maya_keyframe.jpg")
+INPUT = "/Users/monsterlee/.openclaw/media/inbound/file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg"
+OUT  = Path("demo_output")
+OUT.mkdir(exist_ok=True)
 
-DURATION = 5.0
-FPS = 24
-W, H = 1080, 1920
-TOTAL_FRAMES = int(DURATION * FPS)
+STAGE_STEPS = ["A_base", "B_motion", "C_lighting", "D_full"]
 
 
-def save_cmd(stage: str, cmd: list) -> Path:
-    p = DEMO / f"suspense_{stage}.cmd.txt"
-    p.write_text(" ".join(cmd))
-    return p
+# =============================================================================
+# REPORT SCHEMA
+# =============================================================================
 
-def save_stderr(stage: str, stderr: str) -> Path:
-    p = DEMO / f"suspense_{stage}.stderr.log"
-    p.write_text(stderr)
-    return p
+@dataclass
+class StageReport:
+    preset_name: str
+    stage: str
+    pass_: bool
+    failure_type: str          # "" if pass, else: python_stage | ffmpeg | param_mapping | timing_assembly
+    exact_failure_point: str    # exact line / expression that failed
+    exact_failing_expression: str # the actual failing code/command
+    ffmpeg_rc: int
+    output_file: str
+    stderr_log: str
+    command_file: str
+    params_file: str
+    notes: str = ""
+    elapsed_sec: float = 0.0
 
-def run_stage(stage: str, cmd: list, desc: str) -> dict:
-    print(f"\n  [{stage}] {desc}")
-    print(f"  CMD: {' '.join(cmd[:8])}...")
-    cmd_path = save_cmd(stage, cmd)
+    def to_dict(self) -> dict:
+        d = asdict(self)
+        d["pass"] = d.pop("pass_")  # JSON-friendly key
+        return d
 
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
-    stderr_path = save_stderr(stage, result.stderr)
 
-    passed = result.returncode == 0
-    output_path = DEMO / f"suspense_{stage}.mp4"
+# =============================================================================
+# PARAMS SNAPSHOT
+# =============================================================================
 
-    # Filter meaningful stderr lines
-    lines = result.stderr.strip().split("\n")
-    skip = ("ffmpeg version", "  built ", "  configuration:",
-            "  libav", "  h264 ", "  libsw")
-    meaningful = [l for l in lines if l.strip() and not any(l.startswith(s) for s in skip)]
-    last_20 = meaningful[-20:] if meaningful else lines[-20:]
-
-    print(f"  RC: {result.returncode} | {'✅ PASS' if passed else '❌ FAIL'}")
-    if not passed:
-        print(f"  FAILING EXPRESSION (last 20 meaningful lines):")
-        for l in last_20:
-            print(f"    {l}")
-        print(f"  Command: {cmd_path}")
-        print(f"  Stderr:  {stderr_path}")
-
+def build_snapshot(preset_name: str, stage: str, p) -> dict:
+    """Build a params snapshot of ACTUAL applied values."""
     return {
-        "stage": stage, "desc": desc,
-        "passed": passed, "rc": result.returncode,
-        "cmd_file": str(cmd_path),
-        "stderr_file": str(stderr_path),
-        "output": str(output_path) if passed else None,
+        "preset_name": preset_name,
+        "stage": stage,
+        "engine_mode": "cinematic_pil",
+        "move": str(p.move) if hasattr(p, "move") else "push_in",
+        "zoom_start": p.zoom_start,
+        "zoom_end": p.zoom_end,
+        "x_start": p.x_start,
+        "x_end": p.x_end,
+        "y_start": p.y_start,
+        "y_end": p.y_end,
+        "rotation_start_deg": getattr(p, "rot_start", 0.0),
+        "rotation_end_deg": getattr(p, "rot_end", 0.0),
+        "easing": p.easing() if callable(p.easing) else str(p.easing),
+        "micro_shake": p.micro_shake,
+        "breathing": p.breathing,
+        "parallax_strength": getattr(p, "parallax_strength", 0.0),
+        "flicker": p.flicker,
+        "vignette_pulse": p.vignette_pulse,
+        "glow_drift": p.glow_drift,
+        "hold_start_sec": p.hold_start_dur,
+        "main_move_start_sec": p.move_start,
+        "main_move_end_sec": p.move_end,
+        "hold_end_sec": p.hold_end_dur,
+        "duration_sec": p.duration,
+        "fps": 24,
     }
 
 
 # =============================================================================
-# BUILD THE 4 STAGES
+# ENGINE IMPORT
 # =============================================================================
 
-# Reference preset values (from suspense_push.json)
-zoom_start = 1.0
-zoom_end = 1.12
-easing = "ease_in_out"
-hold_start = 1.2
-move_start = 1.2
-move_end = 4.0
-hold_end = 1.0
-micro_shake = 0.006
-breathing = 0.005
-flicker = 0.02
-vignette_pulse = 0.06
-glow_drift = 0.03
-
-# For PIL approach — generate a single frame with specific zoom applied
-def pil_frame(frame_idx: int, zoom: float, shake_x: float, shake_y: float,
-               target_w: int, target_h: int) -> Path:
-    """Generate one frame with PIL."""
-    img = Image.open(IMAGE).convert("RGB")
-    src_w, src_h = img.size
-
-    zoomed_w = src_w * zoom
-    zoomed_h = src_h * zoom
-
-    offset_x = shake_x
-    offset_y = shake_y
-
-    crop_x = (zoomed_w - target_w) / 2 - offset_x
-    crop_y = (zoomed_h - target_h) / 2 - offset_y
-    crop_x = max(0, min(crop_x, zoomed_w - target_w))
-    crop_y = max(0, min(crop_y, zoomed_h - target_h))
-
-    img_zoomed = img.resize((int(zoomed_w), int(zoomed_h)), Image.BICUBIC)
-    frame = img_zoomed.crop((
-        int(crop_x), int(crop_y),
-        int(crop_x) + target_w, int(crop_y) + target_h
-    ))
-    out = Path(tempfile.gettempdir()) / f"iso_frame_{frame_idx:05d}.jpg"
-    frame.save(out, "JPEG", quality=95)
-    return out
+def get_engine():
+    from engine import CinematicShotEngine
+    return CinematicShotEngine()
 
 
 # =============================================================================
-# STAGE A: BASE CAMERA ONLY
-# PIL: linear zoom from zoom_start to zoom_end over entire duration, NO easing
+# STAGE BUILDERS — each returns modified preset with ONLY that stage's params
 # =============================================================================
 
-def stage_a():
-    """Linear zoom only. No hold, no easing, no motion effects."""
-    print("\n" + "="*60)
-    print("STAGE A: BASE CAMERA ONLY")
-    print("  - Linear zoom 1.0 → 1.12 over 5s")
-    print("  - No hold, no easing, no micro_shake, no breathing")
-    print("="*60)
+def apply_stage_a(preset) -> dict:
+    """Stage A: base camera only. All else = 0/false."""
+    return {
+        "camera": {
+            "zoom_start": preset.zoom_start,
+            "zoom_end": preset.zoom_end,
+            "x_start": 0.5, "x_end": 0.5,
+            "y_start": 0.5, "y_end": 0.5,
+            "rotation_start_deg": 0.0, "rotation_end_deg": 0.0,
+            "easing": "linear",
+        },
+        "motion": {
+            "micro_shake": 0.0,
+            "breathing": 0.0,
+            "parallax_strength": 0.0,
+        },
+        "lighting": {
+            "flicker": 0.0,
+            "vignette_pulse": 0.0,
+            "glow_drift": 0.0,
+        },
+        "timing": {
+            "hold_start_sec": 0.0,
+            "main_move_start_sec": 0.0,
+            "main_move_end_sec": 0.0,
+            "hold_end_sec": 0.0,
+        },
+    }
 
-    import math, tempfile
-    tmp_dir = tempfile.mkdtemp(prefix="suspense_A_")
 
-    # Linear zoom: delta/frame = (1.12 - 1.0) / (5*24) = 0.12/120 = 0.001
-    delta = (zoom_end - zoom_start) / TOTAL_FRAMES
-    current_zoom = zoom_start
+def apply_stage_b(preset) -> dict:
+    """Stage B: base camera + motion. Lighting = 0, timing preserved."""
+    return {
+        "camera": {
+            "zoom_start": preset.zoom_start,
+            "zoom_end": preset.zoom_end,
+            "x_start": 0.5, "x_end": 0.5,
+            "y_start": 0.5, "y_end": 0.5,
+            "rotation_start_deg": 0.0, "rotation_end_deg": 0.0,
+            "easing": "linear",
+        },
+        "motion": {
+            "micro_shake": preset.micro_shake,
+            "breathing": preset.breathing,
+            "parallax_strength": 0.0,
+        },
+        "lighting": {
+            "flicker": 0.0,
+            "vignette_pulse": 0.0,
+            "glow_drift": 0.0,
+        },
+        # CRITICAL: timing must be non-zero to avoid div-by-zero in engine
+        "timing": {
+            "hold_start_sec": preset.hold_start_dur,
+            "main_move_start_sec": preset.move_start,
+            "main_move_end_sec": preset.move_end,
+            "hold_end_sec": preset.hold_end_dur,
+        },
+    }
 
-    import hashlib
-    for i in range(TOTAL_FRAMES):
-        # Linear zoom (no easing, no motion)
-        current_zoom = zoom_start + (zoom_end - zoom_start) * (i / TOTAL_FRAMES)
-        # No shake, no breathing
-        frame_path = pil_frame(i, current_zoom, 0.0, 0.0, W, H)
-        shutil.move(str(frame_path), os.path.join(tmp_dir, f"frame_{i:05d}.jpg"))
 
-    output = DEMO / "suspense_A.mp4"
-    cmd = [
-        FFMPEG, "-y",
-        "-framerate", str(FPS),
-        "-i", os.path.join(tmp_dir, "frame_%05d.jpg"),
-        "-t", str(DURATION),
-        "-c:v", "libx264", "-pix_fmt", "yuv420p",
-        "-preset", "fast", "-crf", "18", "-movflags", "+faststart",
-        str(output),
-    ]
-    result = run_stage("A_base", cmd, "Linear zoom only, no easing/motion")
+def apply_stage_c(preset) -> dict:
+    """Stage C: camera + motion + lighting. Timing preserved."""
+    return {
+        "camera": {
+            "zoom_start": preset.zoom_start,
+            "zoom_end": preset.zoom_end,
+            "x_start": 0.5, "x_end": 0.5,
+            "y_start": 0.5, "y_end": 0.5,
+            "rotation_start_deg": 0.0, "rotation_end_deg": 0.0,
+            "easing": "linear",
+        },
+        "motion": {
+            "micro_shake": preset.micro_shake,
+            "breathing": preset.breathing,
+            "parallax_strength": 0.0,
+        },
+        "lighting": {
+            "flicker": preset.flicker,
+            "vignette_pulse": preset.vignette_pulse,
+            "glow_drift": preset.glow_drift,
+        },
+        "timing": {
+            "hold_start_sec": preset.hold_start_dur,
+            "main_move_start_sec": preset.move_start,
+            "main_move_end_sec": preset.move_end,
+            "hold_end_sec": preset.hold_end_dur,
+        },
+    }
 
-    shutil.rmtree(tmp_dir, ignore_errors=True)
-    return result
+
+def apply_stage_d(preset) -> dict:
+    """Stage D: full preset with all timing restored."""
+    return {
+        "camera": {
+            "zoom_start": preset.zoom_start,
+            "zoom_end": preset.zoom_end,
+            "x_start": 0.5, "x_end": 0.5,
+            "y_start": 0.5, "y_end": 0.5,
+            "rotation_start_deg": 0.0, "rotation_end_deg": 0.0,
+            "easing": preset.easing() if callable(preset.easing) else str(preset.easing),
+        },
+        "motion": {
+            "micro_shake": preset.micro_shake,
+            "breathing": preset.breathing,
+            "parallax_strength": 0.0,
+        },
+        "lighting": {
+            "flicker": preset.flicker,
+            "vignette_pulse": preset.vignette_pulse,
+            "glow_drift": preset.glow_drift,
+        },
+        "timing": {
+            "hold_start_sec": preset.hold_start_dur,
+            "main_move_start_sec": preset.move_start,
+            "main_move_end_sec": preset.move_end,
+            "hold_end_sec": preset.hold_end_dur,
+        },
+    }
+
+
+STAGE_BUILDERS = {
+    "A_base":    apply_stage_a,
+    "B_motion":  apply_stage_b,
+    "C_lighting": apply_stage_c,
+    "D_full":    apply_stage_d,
+}
 
 
 # =============================================================================
-# STAGE B: BASE CAMERA + MOTION (micro_shake + breathing)
-# PIL: add micro_shake and breathing on top of linear zoom
+# VARIANT MANAGER — create/test/delete preset variants
 # =============================================================================
 
-def stage_b():
-    """Linear zoom + micro_shake + breathing. No hold, no easing."""
-    print("\n" + "="*60)
-    print("STAGE B: BASE CAMERA + MOTION")
-    print("  - Linear zoom 1.0 → 1.12")
-    print("  + micro_shake=0.006")
-    print("  + breathing=0.005 (sin wave)")
-    print("  - No hold windows, no easing")
-    print("="*60)
+VARIANT_COUNTER = 0
 
-    import math, tempfile
-    tmp_dir = tempfile.mkdtemp(prefix="suspense_B_")
+def create_stage_variant(base_name: str, stage: str, params: dict) -> str:
+    """Save a stage variant JSON to presets/ and return the variant name."""
+    global VARIANT_COUNTER
+    VARIANT_COUNTER += 1
+    variant_name = f"__stage_{stage}_{VARIANT_COUNTER}"
+    path = Path("presets") / f"{variant_name}.json"
+    # Add name field required by Preset.__init__
+    params_with_name = {"name": variant_name, **params}
+    path.write_text(json.dumps(params_with_name, indent=2))
+    return variant_name
 
-    delta = (zoom_end - zoom_start) / TOTAL_FRAMES
-    current_zoom = zoom_start
-    time_sec = 0
 
-    for i in range(TOTAL_FRAMES):
-        time_sec = i / FPS
-        # Linear zoom
-        current_zoom = zoom_start + (zoom_end - zoom_start) * (i / TOTAL_FRAMES)
-        # Breathing
-        breath_zoom = breathing * math.sin(2 * math.pi * 0.35 * time_sec)
-        # Micro shake (deterministic per frame)
-        seed_x = int(hashlib.md5(f"{i}_x".encode()).hexdigest()[:8], 16)
-        seed_y = int(hashlib.md5(f"{i}_y".encode()).hexdigest()[:8], 16)
-        rng_x = ((seed_x % 1000) / 500.0) - 1.0
-        rng_y = ((seed_y % 1000) / 500.0) - 1.0
-        shake_x = rng_x * micro_shake * 1920
-        shake_y = rng_y * micro_shake * 1920
-
-        frame_path = pil_frame(i, current_zoom + breath_zoom, shake_x, shake_y, W, H)
-        shutil.move(str(frame_path), os.path.join(tmp_dir, f"frame_{i:05d}.jpg"))
-
-    output = DEMO / "suspense_B.mp4"
-    cmd = [
-        FFMPEG, "-y",
-        "-framerate", str(FPS),
-        "-i", os.path.join(tmp_dir, "frame_%05d.jpg"),
-        "-t", str(DURATION),
-        "-c:v", "libx264", "-pix_fmt", "yuv420p",
-        "-preset", "fast", "-crf", "18", "-movflags", "+faststart",
-        str(output),
-    ]
-    result = run_stage("B_motion", cmd, "Linear zoom + micro_shake + breathing")
-    shutil.rmtree(tmp_dir, ignore_errors=True)
-    return result
+def cleanup_variant(variant_name: str):
+    """Delete a stage variant JSON."""
+    p = Path("presets") / f"{variant_name}.json"
+    if p.exists():
+        p.unlink()
 
 
 # =============================================================================
-# STAGE C: BASE CAMERA + MOTION + LIGHTING
-# PIL: same as B + FFmpeg lighting effects (vignette_pulse, flicker, glow)
+# STAGE RUNNER
 # =============================================================================
 
-def stage_c():
-    """Zoom + motion + lighting effects. No hold, no easing."""
-    print("\n" + "="*60)
-    print("STAGE C: BASE CAMERA + MOTION + LIGHTING")
-    print("  - Linear zoom 1.0 → 1.12")
-    print("  + micro_shake=0.006 + breathing=0.005")
-    print("  + flicker=0.02, vignette_pulse=0.06, glow_drift=0.03")
-    print("  - No hold windows, no easing")
-    print("="*60)
+def run_stage(preset_name: str, base_preset, stage: str, duration: float) -> StageReport:
+    """
+    Run a single stage. Returns StageReport.
+    On failure: records exact failure point and DOES NOT fall through.
+    """
+    builder = STAGE_BUILDERS[stage]
+    variant_name = create_stage_variant(preset_name, stage, builder(base_preset))
 
-    import math, tempfile
-    tmp_dir = tempfile.mkdtemp(prefix="suspense_C_")
+    prefix = f"{preset_name}_{stage}"
+    dbg_path = OUT / f"{prefix}_frames.json"
+    out_mp4  = OUT / f"{prefix}.mp4"
+    cmd_path = OUT / f"{prefix}.cmd.txt"
+    err_path = OUT / f"{prefix}.stderr.log"
+    snap_path = OUT / f"{prefix}.params.json"
+    rep_path = OUT / f"{prefix}.report.json"
 
-    delta = (zoom_end - zoom_start) / TOTAL_FRAMES
-    time_sec = 0
+    # Write command file
+    cmd_file_content = (
+        f"python3 engine.render(\n"
+        f"  preset_name='{variant_name}',\n"
+        f"  duration={duration},\n"
+        f"  fps=24,\n"
+        f"  input_image='{INPUT}',\n"
+        f"  output_path='{out_mp4}',\n"
+        f"  frame_debug_path='{dbg_path}',\n"
+        f")\n"
+    )
+    cmd_path.write_text(cmd_file_content)
 
-    for i in range(TOTAL_FRAMES):
-        time_sec = i / FPS
-        current_zoom = zoom_start + (zoom_end - zoom_start) * (i / TOTAL_FRAMES)
-        breath_zoom = breathing * math.sin(2 * math.pi * 0.35 * time_sec)
+    # Save params snapshot
+    p = load_preset(variant_name)
+    snap = build_snapshot(preset_name, stage, p)
+    snap_path.write_text(json.dumps(snap, indent=2))
 
-        seed_x = int(hashlib.md5(f"{i}_x".encode()).hexdigest()[:8], 16)
-        seed_y = int(hashlib.md5(f"{i}_y".encode()).hexdigest()[:8], 16)
-        rng_x = ((seed_x % 1000) / 500.0) - 1.0
-        rng_y = ((seed_y % 1000) / 500.0) - 1.0
-        shake_x = rng_x * micro_shake * 1920
-        shake_y = rng_y * micro_shake * 1920
+    # Run engine
+    from engine import CinematicShotEngine
+    engine = CinematicShotEngine()
 
-        frame_path = pil_frame(i, current_zoom + breath_zoom, shake_x, shake_y, W, H)
-        shutil.move(str(frame_path), os.path.join(tmp_dir, f"frame_{i:05d}.jpg"))
+    t0 = time.perf_counter()
+    ffmpeg_rc = -1
+    stderr_log = ""
+    error_msg = ""
 
-    output = DEMO / "suspense_C.mp4"
-
-    # Lighting effects chain
-    # vignette_pulse: eq brightness modulation
-    # flicker: eq brightness micro-variation
-    # glow_drift: eq contrast boost
-    vf_parts = []
-
-    # Flicker: brightness oscillates at ~4Hz
-    if flicker > 0:
-        vf_parts.append(f"eq=brightness={flicker}*sin(t*25):contrast=1.0")
-
-    # Glow drift: subtle contrast boost
-    if glow_drift > 0:
-        vf_parts.append(f"eq=contrast={1+glow_drift}:brightness={glow_drift*0.5}")
-
-    # Vignette pulse: vignette filter with variable strength
-    # Using lenscorrection or curves for vignette
-    # FFmpeg vignette: vignette=angle=PI/3:mode=forward
-    # Pulsing vignette via lut filter... complex.
-    # Simplify: apply fixed vignette + brightness pulse separately
-    if vignette_pulse > 0:
-        # Fixed vignette + brightness pulse
-        freq_v = 0.4
-        # eq for brightness pulse
-        vf_parts.append(
-            f"eq=brightness={vignette_pulse}*sin(t*{freq_v}*{2*3.14159}):contrast=1.0"
+    try:
+        result = engine.render(
+            input_image=INPUT,
+            output_path=str(out_mp4),
+            preset_name=variant_name,
+            duration=duration,
+            fps=24,
+            width=1080, height=1920,
+            frame_debug_path=str(dbg_path),
         )
+    except Exception as e:
+        elapsed = time.perf_counter() - t0
+        error_msg = f"{type(e).__name__}: {e}"
+        stderr_log = error_msg
+        err_path.write_text(error_msg)
 
-    vf = ",".join(vf_parts) if vf_parts else None
-
-    cmd = [
-        FFMPEG, "-y",
-        "-framerate", str(FPS),
-        "-i", os.path.join(tmp_dir, "frame_%05d.jpg"),
-    ]
-    if vf:
-        cmd += ["-vf", vf]
-    cmd += [
-        "-t", str(DURATION),
-        "-c:v", "libx264", "-pix_fmt", "yuv420p",
-        "-preset", "fast", "-crf", "18", "-movflags", "+faststart",
-        str(output),
-    ]
-
-    full_cmd = cmd[:]
-    if vf:
-        full_cmd = cmd[:cmd.index("-vf")] + ["-vf", vf] + cmd[cmd.index("-vf")+2:]
-    # Rebuild cleanly
-    cmd_clean = [
-        FFMPEG, "-y",
-        "-framerate", str(FPS),
-        "-i", os.path.join(tmp_dir, "frame_%05d.jpg"),
-    ]
-    if vf:
-        cmd_clean += ["-vf", vf]
-    cmd_clean += [
-        "-t", str(DURATION),
-        "-c:v", "libx264", "-pix_fmt", "yuv420p",
-        "-preset", "fast", "-crf", "18", "-movflags", "+faststart",
-        str(output),
-    ]
-
-    result = run_stage("C_lighting", cmd_clean,
-                        f"Linear zoom + motion + lighting ({vf_parts})")
-    shutil.rmtree(tmp_dir, ignore_errors=True)
-    return result
-
-
-# =============================================================================
-# STAGE D: FULL PRESET — with timing (hold windows + easing)
-# PIL: easing curve + hold windows + motion effects
-# =============================================================================
-
-def stage_d():
-    """Full suspense_push preset with timing (hold windows + easing)."""
-    print("\n" + "="*60)
-    print("STAGE D: FULL PRESET WITH TIMING")
-    print("  - Timing: hold 1.2s → move 1.2-4.0s → hold 1.0s")
-    print("  - Easing: ease_in_out")
-    print("  - Zoom: 1.0 → 1.12 (at ease_in_out)")
-    print("  + micro_shake + breathing")
-    print("  + lighting effects")
-    print("="*60)
-
-    import math, tempfile
-    tmp_dir = tempfile.mkdtemp(prefix="suspense_D_")
-
-    def ease_in_out(t):
-        return t * t * (3 - 2 * t)
-
-    def get_zoom_and_motion(frame_idx: int):
-        t = frame_idx / TOTAL_FRAMES
-        time_sec = t * DURATION
-
-        # Hold window
-        if t < hold_start / DURATION:
-            zoom = zoom_start
-            pan_x_n, pan_y_n = 0.5, 0.5
-        elif t > move_end / DURATION:
-            zoom = zoom_end
-            pan_x_n, pan_y_n = 0.5, 0.5
-        else:
-            # During move: ease_in_out
-            local_t = (t - hold_start/DURATION) / ((move_end - hold_start) / DURATION)
-            eased = ease_in_out(local_t)
-            zoom = zoom_start + (zoom_end - zoom_start) * eased
-            pan_x_n, pan_y_n = 0.5, 0.5
-
-        # Breathing
-        if breathing > 0:
-            zoom += breathing * math.sin(2 * math.pi * 0.35 * time_sec)
-
-        # Micro shake
-        if micro_shake > 0:
-            seed_x = int(hashlib.md5(f"{frame_idx}_x".encode()).hexdigest()[:8], 16)
-            seed_y = int(hashlib.md5(f"{frame_idx}_y".encode()).hexdigest()[:8], 16)
-            rng_x = ((seed_x % 1000) / 500.0) - 1.0
-            rng_y = ((seed_y % 1000) / 500.0) - 1.0
-            shake_x = rng_x * micro_shake * 1920
-            shake_y = rng_y * micro_shake * 1920
-        else:
-            shake_x, shake_y = 0.0, 0.0
-
-        return zoom, pan_x_n, pan_y_n, shake_x, shake_y
-
-    # Generate frames with hold + easing
-    for i in range(TOTAL_FRAMES):
-        zoom, pan_x_n, pan_y_n, shake_x, shake_y = get_zoom_and_motion(i)
-        frame_path = pil_frame(i, zoom, shake_x, shake_y, W, H)
-        shutil.move(str(frame_path), os.path.join(tmp_dir, f"frame_{i:05d}.jpg"))
-
-    output = DEMO / "suspense_D.mp4"
-
-    # Lighting effects
-    vf_parts = []
-    if flicker > 0:
-        vf_parts.append(f"eq=brightness={flicker}*sin(t*25):contrast=1.0")
-    if glow_drift > 0:
-        vf_parts.append(f"eq=contrast={1+glow_drift}:brightness={glow_drift*0.5}")
-    if vignette_pulse > 0:
-        freq_v = 0.4
-        vf_parts.append(
-            f"eq=brightness={vignette_pulse}*sin(t*{freq_v}*{2*3.14159}):contrast=1.0"
+        rep = StageReport(
+            preset_name=preset_name, stage=stage,
+            pass_=False,
+            failure_type="python_stage",
+            exact_failure_point=f"engine.render() raised {type(e).__name__}",
+            exact_failing_expression=error_msg,
+            ffmpeg_rc=-1,
+            output_file=str(out_mp4),
+            stderr_log=error_msg,
+            command_file=str(cmd_path),
+            params_file=str(snap_path),
+            elapsed_sec=round(elapsed, 2),
         )
-    vf = ",".join(vf_parts) if vf_parts else None
+        rep_path.write_text(json.dumps(rep.to_dict(), indent=2))
+        cleanup_variant(variant_name)
+        return rep
 
-    cmd = [
-        FFMPEG, "-y",
-        "-framerate", str(FPS),
-        "-i", os.path.join(tmp_dir, "frame_%05d.jpg"),
-    ]
-    if vf:
-        cmd += ["-vf", vf]
-    cmd += [
-        "-t", str(DURATION),
-        "-c:v", "libx264", "-pix_fmt", "yuv420p",
-        "-preset", "fast", "-crf", "18", "-movflags", "+faststart",
-        str(output),
-    ]
+    elapsed = time.perf_counter() - t0
+    ffmpeg_rc = result.get("returncode", 0) if isinstance(result, dict) else 0
+    status = result.get("status", "unknown")
+    err_msg = result.get("error", "") if isinstance(result, dict) else ""
+    stderr_log = err_msg
+    err_path.write_text(err_msg)
 
-    desc = f"Full preset + timing ({'hold/ease' if True else 'linear'})"
-    if vf_parts:
-        desc += f" + lighting({len(vf_parts)} effects)"
-    result = run_stage("D_full", cmd, desc)
-    shutil.rmtree(tmp_dir, ignore_errors=True)
-    return result
+    passed = (status == "success" and out_mp4.exists() and out_mp4.stat().st_size > 1000)
+
+    rep = StageReport(
+        preset_name=preset_name, stage=stage,
+        pass_=bool(passed),
+        failure_type="" if passed else (result.get("failure_type", "unknown") if isinstance(result, dict) else "unknown"),
+        exact_failure_point="" if passed else f"status={status}, error={err_msg[:100]}",
+        exact_failing_expression="" if passed else err_msg[:200],
+        ffmpeg_rc=ffmpeg_rc,
+        output_file=str(out_mp4),
+        stderr_log=err_msg[:500],
+        command_file=str(cmd_path),
+        params_file=str(snap_path),
+        elapsed_sec=round(elapsed, 2),
+    )
+    rep_path.write_text(json.dumps(rep.to_dict(), indent=2))
+
+    # Cleanup variant
+    cleanup_variant(variant_name)
+
+    return rep
 
 
 # =============================================================================
@@ -438,58 +380,103 @@ def stage_d():
 # =============================================================================
 
 def main():
-    print("="*60)
-    print("PRESET ISOLATION DEBUGGER — suspense_push")
-    print("="*60)
-    print(f"  FFmpeg: {FFMPEG}")
-    print(f"  Image:  {IMAGE}")
-    print(f"  Output: {DEMO}")
-    print(f"  Duration: {DURATION}s @ {FPS}fps = {TOTAL_FRAMES} frames")
-    print()
+    if len(sys.argv) < 3:
+        print("Usage: preset_isolation.py <preset_name> <duration> [--stage A|B|C|D]")
+        print("Stages: A_base → B_motion → C_lighting → D_full")
+        sys.exit(1)
 
-    results = []
+    preset_name = sys.argv[1]
+    duration    = float(sys.argv[2])
 
-    # Stage A
-    r_a = stage_a()
-    results.append(r_a)
-    if not r_a["passed"]:
-        print("\n" + "="*60)
-        print("🔍 STAGE A FAILED — stopping further tests")
-        print("="*60)
-        return results
+    # Optional: run only one stage
+    run_stages = STAGE_STEPS
+    if "--stage" in sys.argv:
+        idx = sys.argv.index("--stage")
+        target = sys.argv[idx + 1]
+        run_stages = [s for s in STAGE_STEPS if stage_letter(s) == target.upper()]
+        if not run_stages:
+            print(f"Unknown stage: {target}")
+            sys.exit(1)
 
-    # Stage B
-    r_b = stage_b()
-    results.append(r_b)
-    if not r_b["passed"]:
-        print("\n" + "="*60)
-        print("🔍 STAGE B FAILED — motion layer broken")
-        print("="*60)
-        return results
+    # Verify preset is NOT old schema
+    if preset_name in ("suspense", "heartbreak", "reveal", "comedy"):
+        print(f"\n❌ BLOCKED: '{preset_name}' is OLD SCHEMA.")
+        print("   Old schema presets silently map to static (move=static, zoom_start=zoom_end=1.0).")
+        print("   These are NOT valid isolation test subjects.")
+        print("   Use: suspense_push, heartbreak_drift, reveal_hold_push, comedy_snap")
+        sys.exit(1)
 
-    # Stage C
-    r_c = stage_c()
-    results.append(r_c)
-    if not r_c["passed"]:
-        print("\n" + "="*60)
-        print("🔍 STAGE C FAILED — lighting layer broken")
-        print("="*60)
-        return results
+    # Load base preset
+    try:
+        base = load_preset(preset_name)
+    except Exception as e:
+        print(f"❌ Cannot load preset '{preset_name}': {e}")
+        sys.exit(1)
 
-    # Stage D
-    r_d = stage_d()
-    results.append(r_d)
+    print(f"\n{'='*60}")
+    print(f"  PRESET ISOLATION: {preset_name}")
+    print(f"  Duration: {duration}s")
+    print(f"  Stages: {' → '.join(run_stages)}")
+    print(f"{'='*60}")
 
-    # Final report
-    print("\n" + "="*60)
-    print("FINAL REPORT — STAGE RESULTS")
-    print("="*60)
-    for r in results:
-        icon = "✅" if r["passed"] else "❌"
-        print(f"  {icon} Stage {r['stage']:4s} | RC={r['rc']:3d} | {r['desc']}")
-    print("="*60)
+    results = {}
+    first_failure = None
 
-    return results
+    for stage in run_stages:
+        prefix = f"{preset_name}_{stage}"
+        rep_path = OUT / f"{prefix}.report.json"
+
+        print(f"\n--- Stage {stage} ---")
+        t0 = time.perf_counter()
+        rep = run_stage(preset_name, base, stage, duration)
+        elapsed = time.perf_counter() - t0
+        results[stage] = rep
+
+        icon = "✅" if rep.pass_ else "❌"
+        print(f"  {icon} {stage}: {'PASS' if rep.pass_ else 'FAIL'} ({elapsed:.1f}s)")
+
+        if not rep.pass_ and first_failure is None:
+            first_failure = stage
+            print(f"\n  ⚠️  FIRST FAILURE at {stage}")
+            print(f"  Type:    {rep.failure_type}")
+            print(f"  Point:   {rep.exact_failure_point}")
+            print(f"  Detail:  {rep.exact_failing_expression[:100]}")
+            # STOP on first failure — hard rule
+            print(f"\n  ⏹  STOPPING — subsequent stages cancelled")
+            break
+
+    # Print summary
+    print(f"\n{'='*60}")
+    print(f"  ISOLATION SUMMARY: {preset_name}")
+    print(f"{'='*60}")
+    print(f"  {'Stage':12s} {'Pass':6s} {'Type':20s} {'Point'}")
+    print(f"  {'-'*12:12s} {'-'*6:6s} {'-'*20:20s} {'-'*20:20s}")
+    for stage, rep in results.items():
+        print(f"  {stage:12s} {'✅' if rep.pass_ else '❌':6s} "
+              f"{rep.failure_type or 'ok':20s} {rep.exact_failure_point[:40]}")
+
+    if first_failure:
+        rep = results[first_failure]
+        print(f"\n  FIRST FAILURE: {first_failure}")
+        print(f"  Type:    {rep.failure_type}")
+        print(f"  Point:   {rep.exact_failure_point}")
+        print(f"  File:    {rep.params_file}")
+
+    # Save summary
+    summary = {
+        "preset_name": preset_name,
+        "duration": duration,
+        "all_pass": all(r.pass_ for r in results.values()),
+        "first_failure": first_failure,
+        "stages": {stage: rep.to_dict() for stage, rep in results.items()},
+    }
+    sum_path = OUT / f"{preset_name}_isolation_summary.json"
+    sum_path.write_text(json.dumps(summary, indent=2))
+    print(f"\n  Summary: {sum_path}")
+
+
+def stage_letter(s: str) -> str:
+    return s.split("_")[0]
 
 
 if __name__ == "__main__":

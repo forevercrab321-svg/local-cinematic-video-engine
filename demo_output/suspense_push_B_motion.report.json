@@ -1,0 +1,15 @@
+{
+  "preset_name": "suspense_push",
+  "stage": "B_motion",
+  "failure_type": "",
+  "exact_failure_point": "",
+  "exact_failing_expression": "",
+  "ffmpeg_rc": 0,
+  "output_file": "demo_output/suspense_push_B_motion.mp4",
+  "stderr_log": "",
+  "command_file": "demo_output/suspense_push_B_motion.cmd.txt",
+  "params_file": "demo_output/suspense_push_B_motion.params.json",
+  "notes": "",
+  "elapsed_sec": 5.3,
+  "pass": true
+}

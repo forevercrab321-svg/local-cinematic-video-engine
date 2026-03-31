@@ -1,0 +1,27 @@
+{
+  "preset_name": "confrontation_shake",
+  "schema_status": "new_schema",
+  "route_selected": "unknown",
+  "render_status": "success",
+  "render_time_sec": 4.88,
+  "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_confrontation_shake.mp4",
+  "file_size_mb": 0.2822,
+  "effects_requested": [
+    "micro_shake(0.022)",
+    "flicker(0.03)",
+    "vignette_pulse(0.05)",
+    "flicker(intensity=0.03)",
+    "vignette_pulse(intensity=0.05)"
+  ],
+  "effects_applied": [
+    "flicker(0.03)",
+    "vignette_pulse(0.05)"
+  ],
+  "effects_skipped": [
+    "glow_drift(intensity=0)"
+  ],
+  "degraded_mode_used": false,
+  "ffmpeg_rc": -1,
+  "passed": true,
+  "validation_ts": "2026-03-31T06:29:33.561411"
+}

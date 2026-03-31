@@ -1,0 +1,15 @@
+{
+  "preset_name": "suspense_push",
+  "stage": "C_lighting",
+  "failure_type": "",
+  "exact_failure_point": "",
+  "exact_failing_expression": "",
+  "ffmpeg_rc": 0,
+  "output_file": "demo_output/suspense_push_C_lighting.mp4",
+  "stderr_log": "",
+  "command_file": "demo_output/suspense_push_C_lighting.cmd.txt",
+  "params_file": "demo_output/suspense_push_C_lighting.params.json",
+  "notes": "",
+  "elapsed_sec": 5.31,
+  "pass": true
+}

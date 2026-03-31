@@ -1,0 +1,25 @@
+{
+  "preset_name": "heartbreak_drift",
+  "schema_status": "new_schema",
+  "route_selected": "unknown",
+  "render_status": "success",
+  "render_time_sec": 5.05,
+  "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_heartbreak_drift.mp4",
+  "file_size_mb": 0.327,
+  "effects_requested": [
+    "breathing(0.012)",
+    "vignette_pulse(0.04)",
+    "vignette_pulse(intensity=0.04)"
+  ],
+  "effects_applied": [
+    "vignette_pulse(0.04)"
+  ],
+  "effects_skipped": [
+    "flicker(intensity=0)",
+    "glow_drift(intensity=0)"
+  ],
+  "degraded_mode_used": false,
+  "ffmpeg_rc": -1,
+  "passed": true,
+  "validation_ts": "2026-03-31T06:29:19.739326"
+}

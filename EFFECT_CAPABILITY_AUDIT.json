@@ -1,0 +1,224 @@
+{
+  "audit_ts": "2026-03-31T06:29:00-04:00",
+  "effects": {
+    "push_in": {
+      "effect_name": "push_in",
+      "category": "camera",
+      "supported_in_engine": true,
+      "production_safe": true,
+      "fallback_mode": "apply",
+      "method": "zoompan or PIL per-frame",
+      "reason": "Core camera move. Zoompan fallback confirmed working."
+    },
+    "pull_out": {
+      "effect_name": "pull_out",
+      "category": "camera",
+      "supported_in_engine": true,
+      "production_safe": true,
+      "fallback_mode": "apply",
+      "method": "zoompan or PIL per-frame",
+      "reason": "Reverse push_in."
+    },
+    "drift_x": {
+      "effect_name": "drift_x",
+      "category": "camera",
+      "supported_in_engine": false,
+      "production_safe": false,
+      "fallback_mode": "skip",
+      "method": "PIL pan",
+      "reason": "x_start/x_end pan in zoompan requires pre-scale trick. Not yet in route logic."
+    },
+    "drift_y": {
+      "effect_name": "drift_y",
+      "category": "camera",
+      "supported_in_engine": false,
+      "production_safe": false,
+      "fallback_mode": "skip",
+      "method": "PIL pan",
+      "reason": "y_start/y_end pan in zoompan requires pre-scale trick. Not yet in route logic."
+    },
+    "micro_shake": {
+      "effect_name": "micro_shake",
+      "category": "motion",
+      "supported_in_engine": true,
+      "production_safe": true,
+      "fallback_mode": "approximate",
+      "method": "PIL per-frame deterministic offset",
+      "reason": "Confirmed in Stage B isolation. Applied via PIL render only.",
+      "notes": "zoompan path: skipped (approximate). PIL path: applied."
+    },
+    "breathing": {
+      "effect_name": "breathing",
+      "category": "motion",
+      "supported_in_engine": true,
+      "production_safe": true,
+      "fallback_mode": "skip",
+      "method": "PIL per-frame sin-wave zoom modulation",
+      "reason": "Baked into zoom in _compute_frame_transform. >0.001 may cause artifact at slow motion.",
+      "notes": "Validated at 0.005 in Stage B isolation. Optimal \u22640.001 for artifact-free."
+    },
+    "rotation_drift": {
+      "effect_name": "rotation_drift",
+      "category": "camera",
+      "supported_in_engine": false,
+      "production_safe": false,
+      "fallback_mode": "skip",
+      "method": "PIL rotate",
+      "reason": "rotation_start_deg / rotation_end_deg not wired into zoompan route."
+    },
+    "hold_timing": {
+      "effect_name": "hold_timing",
+      "category": "timing",
+      "supported_in_engine": true,
+      "production_safe": true,
+      "fallback_mode": "apply",
+      "method": "PIL frame counting",
+      "reason": "hold_start_dur / hold_end_dur respected in PIL per-frame path."
+    },
+    "easing": {
+      "effect_name": "easing",
+      "category": "timing",
+      "supported_in_engine": true,
+      "production_safe": true,
+      "fallback_mode": "apply",
+      "method": "PIL computed zoom per frame",
+      "reason": "ease_in / ease_out / ease_in_out applied via Python formula in PIL path."
+    },
+    "flicker": {
+      "effect_name": "flicker",
+      "category": "lighting",
+      "supported_in_engine": true,
+      "production_safe": true,
+      "fallback_mode": "skip",
+      "method": "FFmpeg eq filter",
+      "reason": "eq=brightness={flicker}*sin(t*25). Only in PIL route.",
+      "notes": "Applied in suspense_push, reveal_hold_push, confrontation_shake. Skipped if intensity=0."
+    },
+    "vignette_pulse": {
+      "effect_name": "vignette_pulse",
+      "category": "lighting",
+      "supported_in_engine": true,
+      "production_safe": true,
+      "fallback_mode": "skip",
+      "method": "FFmpeg eq brightness oscillation",
+      "reason": "eq=brightness={v}*sin(t*0.4*2\u03c0). Simple approximation of true vignette.",
+      "notes": "All presets that use it pass. Approximated via brightness not true lens vignette."
+    },
+    "glow_drift": {
+      "effect_name": "glow_drift",
+      "category": "lighting",
+      "supported_in_engine": true,
+      "production_safe": true,
+      "fallback_mode": "skip",
+      "method": "FFmpeg eq contrast boost",
+      "reason": "eq=contrast={1+glow}:brightness={glow*0.5}. Working in multiple presets.",
+      "notes": "Applied in suspense_push, reveal_hold_push, memory_float."
+    },
+    "film_grain": {
+      "effect_name": "film_grain",
+      "category": "lighting",
+      "supported_in_engine": true,
+      "production_safe": false,
+      "fallback_mode": "skip",
+      "method": "FFmpeg noise filter",
+      "reason": "Registered as supported but not used in any current preset. Untested in production."
+    },
+    "brightness_modulation": {
+      "effect_name": "brightness_modulation",
+      "category": "lighting",
+      "supported_in_engine": true,
+      "production_safe": true,
+      "fallback_mode": "apply",
+      "method": "FFmpeg eq",
+      "reason": "Baked into flicker / vignette_pulse / glow via eq filter."
+    },
+    "contrast_modulation": {
+      "effect_name": "contrast_modulation",
+      "category": "lighting",
+      "supported_in_engine": true,
+      "production_safe": true,
+      "fallback_mode": "apply",
+      "method": "FFmpeg eq",
+      "reason": "Baked into glow_drift."
+    },
+    "color_grade": {
+      "effect_name": "color_grade",
+      "category": "lighting",
+      "supported_in_engine": false,
+      "production_safe": false,
+      "fallback_mode": "skip",
+      "method": "None",
+      "reason": "Explicitly disabled in EffectRegistry. color_grade in old schema presets = skipped."
+    },
+    "temperature_shift": {
+      "effect_name": "temperature_shift",
+      "category": "lighting",
+      "supported_in_engine": false,
+      "production_safe": false,
+      "fallback_mode": "skip",
+      "method": "None",
+      "reason": "Not implemented in FFmpeg or PIL pipeline."
+    },
+    "parallax": {
+      "effect_name": "parallax",
+      "category": "depth",
+      "supported_in_engine": true,
+      "production_safe": false,
+      "fallback_mode": "approximate",
+      "method": "PIL layer offset",
+      "reason": "Registered as approximate fallback. Not tested in current presets."
+    },
+    "layered_depth_split": {
+      "effect_name": "layered_depth_split",
+      "category": "depth",
+      "supported_in_engine": false,
+      "production_safe": false,
+      "fallback_mode": "skip",
+      "method": "None",
+      "reason": "Not implemented."
+    },
+    "foreground_offset": {
+      "effect_name": "foreground_offset",
+      "category": "depth",
+      "supported_in_engine": false,
+      "production_safe": false,
+      "fallback_mode": "skip",
+      "method": "PIL layer offset",
+      "reason": "Not implemented."
+    }
+  },
+  "route_effect_matrix": {
+    "static_ffmpeg": {
+      "description": "Direct FFmpeg pad + optional zoompan",
+      "supports_effects": [
+        "flicker",
+        "glow_drift",
+        "vignette_pulse"
+      ],
+      "graceful_skip": true,
+      "notes": "Old-schema presets always land here."
+    },
+    "simple_zoompan_ffmpeg": {
+      "description": "Single zoompan expression, portrait pre-scale fix",
+      "supports_effects": [
+        "flicker",
+        "glow_drift",
+        "vignette_pulse"
+      ],
+      "graceful_skip": true,
+      "practical_limit": "Only linear zoom. No PIL effects."
+    },
+    "cinematic_pil": {
+      "description": "PIL per-frame generation + FFmpeg encode",
+      "supports_effects": [
+        "micro_shake",
+        "breathing",
+        "flicker",
+        "glow_drift",
+        "vignette_pulse"
+      ],
+      "graceful_skip": true,
+      "notes": "Primary cinematic route. All effects have graceful fallback."
+    }
+  }
+}

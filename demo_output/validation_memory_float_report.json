@@ -1,0 +1,25 @@
+{
+  "preset_name": "memory_float",
+  "schema_status": "new_schema",
+  "route_selected": "unknown",
+  "render_status": "success",
+  "render_time_sec": 6.17,
+  "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_memory_float.mp4",
+  "file_size_mb": 0.4489,
+  "effects_requested": [
+    "breathing(0.015)",
+    "glow_drift(0.05)",
+    "glow_drift(intensity=0.05)"
+  ],
+  "effects_applied": [
+    "glow_drift(0.05)"
+  ],
+  "effects_skipped": [
+    "flicker(intensity=0)",
+    "vignette_pulse(intensity=0)"
+  ],
+  "degraded_mode_used": false,
+  "ffmpeg_rc": -1,
+  "passed": true,
+  "validation_ts": "2026-03-31T06:29:39.736646"
+}

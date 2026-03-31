@@ -19,12 +19,6 @@ from typing import Optional
 # GOLDEN PRESETS (locked at 4)
 # =============================================================================
 
-GOLDEN_PRESETS = frozenset({
-    "suspense_push",
-    "heartbreak_drift",
-    "reveal_hold_push",
-    "comedy_snap",
-})
 
 
 # =============================================================================

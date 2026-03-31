@@ -1,0 +1,29 @@
+{
+  "preset_name": "suspense_push",
+  "schema_status": "new_schema",
+  "route_selected": "unknown",
+  "render_status": "success",
+  "render_time_sec": 5.37,
+  "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/demo_output/validation_suspense_push.mp4",
+  "file_size_mb": 0.3753,
+  "effects_requested": [
+    "micro_shake(0.006)",
+    "breathing(0.005)",
+    "flicker(0.02)",
+    "glow_drift(0.03)",
+    "vignette_pulse(0.06)",
+    "flicker(intensity=0.02)",
+    "glow_drift(intensity=0.03)",
+    "vignette_pulse(intensity=0.06)"
+  ],
+  "effects_applied": [
+    "flicker(0.02)",
+    "glow_drift(0.03)",
+    "vignette_pulse(0.06)"
+  ],
+  "effects_skipped": [],
+  "degraded_mode_used": false,
+  "ffmpeg_rc": -1,
+  "passed": true,
+  "validation_ts": "2026-03-31T06:29:14.692547"
+}
