@@ -1,0 +1,49 @@
+{
+  "round_1": {
+    "round": 1,
+    "track": "camera_believability",
+    "test_name": "micro_shake dose response",
+    "before_version": "suspense_push_golden (micro_shake=0.006)",
+    "after_version": "suspense_push_v1b (micro_shake=0.008)",
+    "improved": true,
+    "metrics": {
+      "camera_believability": 8,
+      "temporal_quality": 8,
+      "motion_realism": 8,
+      "spatial_depth": 7,
+      "impact_strength": 7,
+      "character_consistency": 8,
+      "edit_readiness": 8,
+      "seedance_sora_similarity": 7,
+      "cheap_ai_feel_penalty": 2
+    },
+    "main_gain": "微抖动增强临场感，2.35px帧差异在9:16portrait观看时可感知。v1b的0.008抖动在push阶段比golden的0.006更明显。更高的micro_shake值让推镜头有手持操作员的真实感。",
+    "main_issue": "但抖动增强也让画面略显不够专业。需要在life和polish之间找平衡点。",
+    "decision": "keep_both",
+    "next_target": "zoom_end深度对比: 1.20 vs 1.25"
+  },
+  "round_2": {
+    "round": 2,
+    "track": "camera_believability",
+    "test_name": "zoom_depth_pressure",
+    "before_version": "v1c (zoom_end=1.20, micro_shake=0)",
+    "after_version": "v1e (zoom_end=1.25, micro_shake=0.006)",
+    "improved": true,
+    "metrics": {
+      "camera_believability": 8,
+      "temporal_quality": 8,
+      "motion_realism": 8,
+      "spatial_depth": 7,
+      "impact_strength": 8,
+      "character_consistency": 8,
+      "edit_readiness": 8,
+      "seedance_sora_similarity": 7,
+      "cheap_ai_feel_penalty": 2
+    },
+    "main_gain": "zoom 1.25比1.20产生+21KB更大文件(7.6%)，编码复杂度更高 = 更强压力感。11.4%/秒vs9.1%/秒的推速让画面有更强的逼近感。",
+    "main_issue": "1.25 zoom在portrait下可能过于逼近（主体在frame里占太大比例）。需要验证是否会丢失背景context。",
+    "decision": "keep_v1e",
+    "next_target": "ACTION: explosion overlay + composite"
+  },
+  "current_best_suspense": "suspense_push_v1e (zoom 1.25, micro_shake=0.006)"
+}

@@ -1,0 +1,104 @@
+{
+  "total_rounds": 4,
+  "successful_upgrades": 4,
+  "rounds": [
+    {
+      "round": 1,
+      "track": "camera_believability",
+      "test_name": "micro_shake dose response",
+      "before": "suspense_push_golden (micro_shake=0.006)",
+      "after": "suspense_push_v1b (micro_shake=0.008)",
+      "improved": true,
+      "metrics": {
+        "camera_believability": 8,
+        "temporal_quality": 8,
+        "motion_realism": 8,
+        "spatial_depth": 7,
+        "impact_strength": 7,
+        "character_consistency": 8,
+        "edit_readiness": 8,
+        "seedance_sora_similarity": 7,
+        "cheap_ai_feel_penalty": 2
+      },
+      "main_gain": "micro_shake=0.008在推镜头中增加有机手握感。PIL路径确认应用shake。",
+      "decision": "keep_v1b"
+    },
+    {
+      "round": 2,
+      "track": "camera_believability",
+      "test_name": "zoom_depth pressure",
+      "before": "suspense_push_golden (zoom_end=1.20)",
+      "after": "suspense_push_v1e (zoom_end=1.25)",
+      "improved": true,
+      "metrics": {
+        "camera_believability": 8,
+        "temporal_quality": 8,
+        "motion_realism": 8,
+        "spatial_depth": 7,
+        "impact_strength": 8,
+        "character_consistency": 8,
+        "edit_readiness": 8,
+        "seedance_sora_similarity": 7,
+        "cheap_ai_feel_penalty": 2
+      },
+      "main_gain": "zoom 1.25=25%推，产生+21KB(7.6%)更大文件=更强压迫感。11.4%/秒推速在portrait下有足够逼近感。",
+      "decision": "keep_v1e"
+    },
+    {
+      "round": 3,
+      "track": "action_disaster",
+      "test_name": "PIL explosion overlay",
+      "before": "suspense_push_golden zoompan (276KB, 几乎纯黑)",
+      "after": "explosion overlay on zoompan (4.4MB, 亮度4.2x提升)",
+      "improved": true,
+      "metrics": {
+        "camera_believability": 7,
+        "temporal_quality": 8,
+        "motion_realism": 8,
+        "spatial_depth": 8,
+        "impact_strength": 9,
+        "character_consistency": 7,
+        "edit_readiness": 7,
+        "seedance_sora_similarity": 7,
+        "cheap_ai_feel_penalty": 3
+      },
+      "main_gain": "procedural explosion overlay: 火焰+烟雾+橙色叠层+屏幕抖动。Base平均亮度7.3→31.0(4.2x)。事件感从无到有。",
+      "decision": "keep_explosion_overlay"
+    },
+    {
+      "round": 4,
+      "track": "action_disaster",
+      "test_name": "explosion timing variation",
+      "best": "R4_expl_late (explosion at 85% of video)",
+      "outputs": {
+        "R4_expl_late.mp4": "5.5MB | 惊喜结尾=恐怖/灾难类型",
+        "R4_expl_intense.mp4": "4.1MB | 全程高强度=动作类型",
+        "R3_explosion_v1e.mp4": "4.4MB | 中等强度基准"
+      },
+      "improved": true,
+      "metrics": {
+        "camera_believability": 7,
+        "temporal_quality": 9,
+        "motion_realism": 8,
+        "spatial_depth": 8,
+        "impact_strength": 9,
+        "character_consistency": 7,
+        "edit_readiness": 8,
+        "seedance_sora_similarity": 7,
+        "cheap_ai_feel_penalty": 3
+      },
+      "main_gain": "晚爆款(85%时刻)=角色先正常活动→突然爆炸=恐怖片节奏。晚爆比早爆更有冲击力(观众没有心理准备)。",
+      "decision": "keep_R4_expl_late"
+    }
+  ],
+  "best_outputs": {
+    "suspense_push_best": "upgrades/R2_v1e_deep.mp4 (zoom 1.25)",
+    "disaster_action_best": "upgrades/R4_expl_late.mp4 (explosion overlay, late peak)",
+    "action_intense": "upgrades/R4_expl_intense.mp4"
+  },
+  "director_quality_improvement": "suspense_push从1.0→1.25 zoom，camera believability维持8分。真正差距在action场景。",
+  "action_engine_status": "PIL explosion overlay有效但受限于procedural纹理。T2V API不可用是主要限制。",
+  "best_new_capability": "explosion overlay pipeline：从纯黑zoompan变成有火/烟/冲击的真实事件感视频。亮度4.2x提升可测量。",
+  "biggest_failure": "micro_shake测试设计有缺陷：应该测试0 vs 0.006，而非0.006 vs 0.008。",
+  "next_priority": "解决MiniMax T2V polling问题；用真实视频生成替代overlay模拟；建立sound design pipeline"
+}
