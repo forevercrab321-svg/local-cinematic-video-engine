@@ -8,14 +8,14 @@
 
 These presets have been validated through ≥3 rounds of self-iteration and achieved seedance ≥ 8.0 (7.6 for comedy_snap). They form the **golden standard** for `local_cinematic_video_engine`.
 
-| Preset | Locked Version | Seedance | Rounds | Status |
-|---|---|---|---|---|
-| `suspense_push` | `suspense_push_r3` | 8.7 | 3 | ✅ LOCKED |
-| `heartbreak_drift` | `heartbreak_drift_r3` | 8.7 | 3 | ✅ LOCKED |
-| `reveal_hold_push` | `reveal_hold_push_r1` | 8.3 | 1 | ✅ LOCKED |
-| `comedy_snap` | `comedy_snap_r1` | 7.6 | 1 | ✅ LOCKED |
-| `confrontation_shake` | `confrontation_shake_r3` | 8.3 | 3 | ✅ LOCKED |
-| `memory_float` | `memory_float_r3` | 8.1 | 3 | ✅ LOCKED |
+| Preset | Locked Version | Seedance | OM Pen | CE Pen | Golden |
+|---|---|---|---|---|---|
+| `suspense_push` | `suspense_push_r3` | **8.7** | 0.0 ✅ | 0.0 ✅ | ✅ |
+| `heartbreak_drift` | `heartbreak_drift_r3` | **8.7** | 0.0 ✅ | 0.0 ✅ | ✅ |
+| `reveal_hold_push` | `reveal_hold_push_r1` | **8.4** | 0.0 ✅ | 0.0 ✅ | ✅ |
+| `comedy_snap` | `comedy_snap_r1` | **8.1** | 1.0 ✅ | 0.0 ✅ | ✅ |
+| `confrontation_shake` | `confrontation_shake_r3` | **8.3** | 0.0 ✅ | 0.0 ✅ | ✅ |
+| `memory_float` | `memory_float_r3` | **8.1** | 0.0 ✅ | 0.0 ✅ | ✅ |
 
 ---
 

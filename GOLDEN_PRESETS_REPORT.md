@@ -3,8 +3,14 @@
 
 **Date:** 2026-03-31
 **Iteration rounds:** 3 (R1: discovery, R2: convergence, R3: lock)
-**Final seedance threshold:** ≥8.0 (intent_clarity × 0.15 + emotional_pressure × 0.15 + timing_quality × 0.10 + hold_quality × 0.10 + push_pull_feel × 0.15 + cinematic_believability × 0.20 + short_drama_usability × 0.15)
-**Lock criteria:** seedance ≥ 8.0 AND over_motion_penalty ≥ 7 AND cheap_effect_penalty ≥ 7
+**Rubric version:** v2_corrected
+**Final seedance threshold:** ≥8.0 (weighted composite)
+**Lock criteria:**
+- seedance_likeness ≥ 8.0
+- cinematic_believability ≥ 8
+- short_drama_usability ≥ 8
+- over_motion penalty ≤ 3 (penalty score ≥ 7 on 0-10 scale = less penalty)
+- cheap_effect penalty ≤ 3 (penalty score ≥ 7 on 0-10 scale = less penalty)
 
 ---
 

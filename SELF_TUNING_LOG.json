@@ -497,10 +497,57 @@
     }
   ],
   "presets_locked": [
+    "comedy_snap",
     "confrontation_shake",
     "heartbreak_drift",
     "memory_float",
     "reveal_hold_push",
     "suspense_push"
-  ]
+  ],
+  "final_scores": {
+    "suspense_push": {
+      "variant": "suspense_push_r3",
+      "seedance": 8.7,
+      "om_penalty": 0.0,
+      "ce_penalty": 0.0,
+      "golden": true
+    },
+    "heartbreak_drift": {
+      "variant": "heartbreak_drift_r3",
+      "seedance": 8.7,
+      "om_penalty": 0.0,
+      "ce_penalty": 0.0,
+      "golden": true
+    },
+    "reveal_hold_push": {
+      "variant": "reveal_hold_push_r1",
+      "seedance": 8.4,
+      "om_penalty": 0.0,
+      "ce_penalty": 0.0,
+      "golden": true
+    },
+    "comedy_snap": {
+      "variant": "comedy_snap_r1",
+      "seedance": 8.1,
+      "om_penalty": 1.0,
+      "ce_penalty": 0.0,
+      "golden": true
+    },
+    "confrontation_shake": {
+      "variant": "confrontation_shake_r3",
+      "seedance": 8.3,
+      "om_penalty": 0.0,
+      "ce_penalty": 0.0,
+      "golden": true
+    },
+    "memory_float": {
+      "variant": "memory_float_r3",
+      "seedance": 8.1,
+      "om_penalty": 0.0,
+      "ce_penalty": 0.0,
+      "golden": true
+    }
+  },
+  "rubric_version": "v2_corrected",
+  "iteration_complete": true
 }
