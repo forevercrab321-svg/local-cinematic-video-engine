@@ -1,0 +1,69 @@
+{
+  "project": "TEST_PILOT",
+  "scene_manifest_version": "1.0",
+  "description": "Pilot test of scene batch rendering — 4 golden presets",
+  "fps": 24,
+  "aspect_ratio": "9:16",
+  "render_config": {
+    "codec": "h264",
+    "quality": "high"
+  },
+  "shots": [
+    {
+      "shot_id": "SHOT_01",
+      "input_image": "../../../media/inbound/file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+      "output_file": "SHOT_01_suspense_push.mp4",
+      "preset": "suspense_push",
+      "duration_sec": 5.0,
+      "fps": 24,
+      "aspect_ratio": "9:16",
+      "caption_text": "He was about to find out...",
+      "dialogue": null,
+      "note": "Hero front — breathing should be visible in frame_debug",
+      "risk_level": "safe",
+      "shot_type": "hero_front"
+    },
+    {
+      "shot_id": "SHOT_02",
+      "input_image": "../../../media/inbound/file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+      "output_file": "SHOT_02_heartbreak_drift.mp4",
+      "preset": "heartbreak_drift",
+      "duration_sec": 5.0,
+      "fps": 24,
+      "aspect_ratio": "9:16",
+      "caption_text": null,
+      "dialogue": null,
+      "note": "Slow pull-out — emotional recession",
+      "risk_level": "safe",
+      "shot_type": "medium"
+    },
+    {
+      "shot_id": "SHOT_03",
+      "input_image": "../../../media/inbound/file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+      "output_file": "SHOT_03_reveal_hold_push.mp4",
+      "preset": "reveal_hold_push",
+      "duration_sec": 5.0,
+      "fps": 24,
+      "aspect_ratio": "9:16",
+      "caption_text": "The look that changed everything",
+      "dialogue": null,
+      "note": "Hold then push — revelation moment",
+      "risk_level": "safe",
+      "shot_type": "face_closeup"
+    },
+    {
+      "shot_id": "SHOT_04",
+      "input_image": "../../../media/inbound/file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+      "output_file": "SHOT_04_comedy_snap.mp4",
+      "preset": "comedy_snap",
+      "duration_sec": 3.5,
+      "fps": 24,
+      "aspect_ratio": "9:16",
+      "caption_text": "When you realize you forgot to hit record",
+      "dialogue": null,
+      "note": "Comedy timing — deadpan to reality crash",
+      "risk_level": "safe",
+      "shot_type": "reaction"
+    }
+  ]
+}

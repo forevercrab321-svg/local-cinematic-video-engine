@@ -2,8 +2,17 @@
 
 **Director-grade cinematic shot video engine — no AI, no GPU, pure Python + FFmpeg.**
 
-Input: keyframe image or video frame  
-Output: H.264 MP4 with real camera motion, easing curves, micro-effects
+---
+
+## Input Contract
+
+```
+INPUT:  Single keyframe image  (.jpg, .jpeg, .png, .webp)
+OUTPUT: Cinematic shot video   (.mp4, H.264, 24fps, 9:16)
+```
+
+> ⚠️ **This is an image-to-video engine.** Video files are explicitly rejected.
+> To convert video to keyframes, use `local_video_ingest` skill first.
 
 ---
 
@@ -12,8 +21,98 @@ Output: H.264 MP4 with real camera motion, easing curves, micro-effects
 ```bash
 cd ~/.openclaw/workspace/skills/local_cinematic_video_engine
 
-# Single shot
-python3 run_shot.py --image KEYFRAME.png --preset reveal_hold_push
+# Single shot (input MUST be a keyframe image)
+python3 run_shot.py --image KEYFRAME.jpg --preset reveal_hold_push
+
+# Scene batch render (4 golden presets, crash-safe ledger)
+python3 run_scene.py scene_manifests/TEST_PILOT.json
+
+# Validate manifest without rendering
+python3 run_scene.py scene_manifests/TEST_PILOT.json --validate-only
+
+# List available scene manifests
+python3 run_scene.py --list-scenes
+
+# System check
+python3 run_shot.py --check
+```
+
+---
+
+## Scene Batch Rendering
+
+Render an entire scene (multiple shots) from a `scene_manifest.json`.
+
+**Example manifest:**
+```json
+{
+  "project": "IN_THE_GROUP_CHAT",
+  "scene_manifest_version": "1.0",
+  "shots": [
+    {
+      "shot_id": "SHOT_01",
+      "input_image": "/path/to/shot1.jpg",
+      "output_file": "renders/SHOT_01.mp4",
+      "preset": "suspense_push",
+      "duration_sec": 5.0,
+      "fps": 24,
+      "aspect_ratio": "9:16",
+      "caption_text": "He was about to find out...",
+      "risk_level": "safe",
+      "shot_type": "hero_front"
+    }
+  ]
+}
+```
+
+**Golden presets (locked at 4):**
+- `suspense_push` — hold → slow → slam (1.0→1.12x zoom)
+- `heartbreak_drift` — slow pull-out (1.0→0.91x zoom)
+- `reveal_hold_push` — hold → push in (1.0→1.15x)
+- `comedy_snap` — static micro-movement for reaction shots
+
+**Output:** `scene_render_ledger.json` with per-shot:
+- `preset_name`, `schema_version`
+- `timeline_applied`, `camera_params_applied`
+- `effects_requested`, `effects_applied`, `effects_skipped`
+- `frame_count`, `engine_mode`, `render_time_sec`
+
+```bash
+python3 run_scene.py scene_manifests/MY_SCENE.json --verbose
+```
+
+---
+
+## Manifest Schema Fields
+
+Every render produces a complete `scene_render_ledger.json`:
+
+```json
+{
+  "shot_id": "SHOT_01",
+  "preset": "suspense_push",
+  "status": "success",
+  "method": "pil",
+  "frame_count": 120,
+  "timeline_applied": {
+    "hold_start_sec": 1.2,
+    "main_move_start_sec": 1.2,
+    "main_move_end_sec": 4.0,
+    "hold_end_sec": 1.0
+  },
+  "camera_params_applied": {
+    "move": "push_in",
+    "zoom_start": 1.0,
+    "zoom_end": 1.12,
+    "easing": "ease_in_out"
+  },
+  "effects_requested": ["micro_shake", "breathing", "flicker", "vignette_pulse", "glow_drift"],
+  "effects_applied": ["flicker(0.02)", "glow_drift(0.03)", "vignette_pulse(0.06)"],
+  "effects_skipped": []
+}
+```
+
+> **Note:** Always use an image file (.jpg, .png, .webp) as input. Video files are rejected with a clear error.
 
 # Diagnose FFmpeg filter chain
 python3 debug.py --image KEYFRAME.png --preset suspense_push
@@ -21,16 +120,17 @@ python3 debug.py --image KEYFRAME.png --preset suspense_push
 
 ---
 
-## Presets (6 available)
+## Presets (4 golden — locked, production-validated)
 
-| File | Name | Duration | Camera Motion | Mood |
-|------|------|----------|--------------|------|
-| `suspense_push` | Suspense Push | 5s | hold→slow→slam (1.0→1.12x) | Dread → slam |
-| `heartbreak_drift` | Heartbreak Drift | 5s | slow pull-out (1.0→0.91x) | Slow recession |
-| `confrontation_shake` | Confrontation Shake | 4.5s | snap-in + tremor | Conflict, tension |
-| `reveal_hold_push` | Reveal Hold → Push | 5s | hold→hold→SLAM (1.0→1.15x) | Recognition → hit |
-| `comedy_snap` | Comedy Snap | 3.5s | deadpan hold→micro | The "yeah" face |
-| `memory_float` | Memory Float | 6s | slow drift + breath | Dreamlike |
+| Preset | Duration | Camera Motion | Mood |
+|--------|----------|--------------|------|
+| `suspense_push` | 5s | hold→slow→slam (1.0→1.12x zoom) | Dread → slam |
+| `heartbreak_drift` | 5s | slow pull-out (1.0→0.91x zoom) | Slow recession |
+| `reveal_hold_push` | 5s | hold→hold→SLAM (1.0→1.15x zoom) | Recognition → hit |
+| `comedy_snap` | 3.5s | static micro-movement | Deadpan reaction |
+
+> **Production rule:** No new presets until all 4 are fully characterized.
+> The 2 additional presets (`confrontation_shake`, `memory_float`) are available but not yet golden-validated.
 
 ---
 

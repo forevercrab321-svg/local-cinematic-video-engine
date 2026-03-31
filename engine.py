@@ -70,6 +70,7 @@ class CinematicShotEngine:
         height: int = 1920,
         camera_override: str = None,
         additional_effects: list = None,
+        frame_debug_path: str | None = None,
     ) -> dict:
         """Render a cinematic shot with graceful degradation."""
         import time
@@ -80,6 +81,41 @@ class CinematicShotEngine:
         img_path = Path(input_image)
         if not img_path.exists():
             return {"status": "failed", "error": f"Image not found: {input_image}"}
+
+        # ── INPUT TYPE VALIDATION ──────────────────────────────────────────
+        # This engine is strictly image-to-video.
+        # Video files are explicitly rejected with a clear error message.
+        VIDEO_EXTENSIONS = {".mp4", ".mov", ".avi", ".mkv", ".webm", ".m4v", ".flv"}
+        IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tiff", ".tif"}
+
+        ext = img_path.suffix.lower()
+        if ext in VIDEO_EXTENSIONS:
+            return {
+                "status": "failed",
+                "error": (
+                    "local_cinematic_video_engine currently expects a keyframe image input, "
+                    f"not a video file.\n"
+                    f"  Received: {img_path.name} (video)\n"
+                    f"  Supported input: single keyframe image (.jpg, .png, .webp)\n"
+                    f"  Output: cinematic shot video (.mp4)\n"
+                    f"  To convert video to images, use the local_video_ingest skill first."
+                ),
+                "input_type": "video_rejected",
+                "input_file": str(img_path),
+                "supported_input": "keyframe image",
+            }
+
+        if ext not in IMAGE_EXTENSIONS:
+            return {
+                "status": "failed",
+                "error": (
+                    f"Unsupported input file type: '{ext}'\n"
+                    f"  Received: {img_path.name}\n"
+                    f"  Supported input: keyframe image (.jpg, .jpeg, .png, .webp, .bmp)"
+                ),
+                "input_type": "unsupported",
+                "input_file": str(img_path),
+            }
 
         out_path = Path(output_path)
         out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -147,19 +183,8 @@ class CinematicShotEngine:
         self._log(f"🎬 {img_path.name}")
         self._log(f"   Preset: {preset.name} | {width}×{height} | {preset.duration}s")
 
-        # --- Resolve input: extract first frame if video ---
-        is_video = img_path.suffix.lower() in (".mp4", ".mov", ".avi", ".mkv", ".webm")
-        if is_video:
-            temp_frame = Path(tempfile.gettempdir()) / f"eng_first_{os.getpid()}.jpg"
-            extr = subprocess.run([
-                self.ffmpeg, "-y", "-i", str(img_path),
-                "-vframes", "1", "-q:v", "2", str(temp_frame)
-            ], capture_output=True, text=True, timeout=30)
-            if extr.returncode != 0 or not temp_frame.exists():
-                return {"status": "failed", "error": f"Frame extract failed: {extr.stderr[-150:]}"}
-            actual_input = str(temp_frame)
-
-        # --- Auto-select render path ---
+        # --- Render path selection ---
+        # (video already rejected above; input is always a keyframe image)
         has_motion = (
             preset.zoom_start != preset.zoom_end
             or preset.x_start != preset.x_end
@@ -231,37 +256,57 @@ class CinematicShotEngine:
             stderr_file = out_path.with_suffix(".ffmpeg.stderr.log")
             stderr_file.write_text(result.stderr)
 
+            manifest_base = {
+                "preset_name": preset.name,
+                "schema_version": "v1",
+                "timeline_applied": {
+                    "hold_start_sec": preset.hold_start_dur,
+                    "main_move_start_sec": preset.move_start,
+                    "main_move_end_sec": preset.move_end,
+                    "hold_end_sec": preset.hold_end_dur,
+                },
+                "camera_params_applied": {
+                    "move": preset.move(),
+                    "zoom_start": preset.zoom_start,
+                    "zoom_end": preset.zoom_end,
+                    "x_start": preset.x_start,
+                    "x_end": preset.x_end,
+                    "y_start": preset.y_start,
+                    "y_end": preset.y_end,
+                    "rotation_start_deg": preset.rot_start,
+                    "rotation_end_deg": preset.rot_end,
+                    "easing": preset.easing(),
+                },
+                "effects_requested": effects_requested,
+                "effects_applied": effects_applied,
+                "effects_skipped": effects_skipped,
+            }
+
             if result.returncode == 0 and out_path.exists():
                 size_mb = out_path.stat().st_size / (1024 * 1024)
                 self._log(f"  ✅ {out_path.name} — {size_mb:.2f}MB | {elapsed:.1f}s")
                 final_result = {
+                    **manifest_base,
                     "status": "success",
                     "output_path": str(out_path),
                     "file_size_mb": round(size_mb, 2),
                     "duration": actual_duration,
                     "render_time_sec": round(elapsed, 1),
-                    "preset": preset.name,
                     "camera_intensity": camera_intensity,
                     "resolution": f"{width}×{height}",
                     "fps": actual_fps,
                     "method": "static_ffmpeg",
-                    "effects_requested": effects_requested,
-                    "effects_applied": effects_applied,
-                    "effects_skipped": effects_skipped,
                     "lighting_vf": ",".join(vf_parts) if vf_parts else None,
                     "render_log": self._log_entries,
                 }
             else:
                 self._log(f"  ❌ RC={result.returncode}")
                 final_result = {
+                    **manifest_base,
                     "status": "failed",
                     "error": f"FFmpeg RC={result.returncode}: {result.stderr[-200:]}",
                     "render_time_sec": round(elapsed, 1),
-                    "preset": preset.name,
                     "method": "static_ffmpeg",
-                    "effects_requested": effects_requested,
-                    "effects_applied": effects_applied,
-                    "effects_skipped": effects_skipped,
                     "render_log": self._log_entries,
                 }
 
@@ -280,28 +325,49 @@ class CinematicShotEngine:
             stderr_file = out_path.with_suffix(".ffmpeg.stderr.log")
             stderr_file.write_text(result.stderr)
 
+            manifest_base = {
+                "preset_name": preset.name,
+                "schema_version": "v1",
+                "timeline_applied": {
+                    "hold_start_sec": preset.hold_start_dur,
+                    "main_move_start_sec": preset.move_start,
+                    "main_move_end_sec": preset.move_end,
+                    "hold_end_sec": preset.hold_end_dur,
+                },
+                "camera_params_applied": {
+                    "move": preset.move(),
+                    "zoom_start": preset.zoom_start,
+                    "zoom_end": preset.zoom_end,
+                    "x_start": preset.x_start,
+                    "x_end": preset.x_end,
+                    "y_start": preset.y_start,
+                    "y_end": preset.y_end,
+                    "rotation_start_deg": preset.rot_start,
+                    "rotation_end_deg": preset.rot_end,
+                    "easing": preset.easing(),
+                },
+                "effects_requested": effects_requested,
+                "effects_skipped": ["breathing", "micro_shake", "flicker", "glow_drift", "vignette_pulse"],
+            }
+
             if result.returncode == 0 and out_path.exists():
                 size_mb = out_path.stat().st_size / (1024 * 1024)
                 self._log(f"  ✅ {out_path.name} — {size_mb:.2f}MB | {elapsed:.1f}s [zoompan]")
-                effects_skipped = ["breathing", "micro_shake", "flicker", "glow_drift", "vignette_pulse"]
                 final_result = {
+                    **manifest_base,
                     "status": "success",
                     "output_path": str(out_path),
                     "file_size_mb": round(size_mb, 2),
                     "duration": actual_duration,
                     "render_time_sec": round(elapsed, 1),
-                    "preset": preset.name,
                     "fps": actual_fps,
                     "resolution": f"{width}×{height}",
                     "method": "zoompan",
-                    "effects_requested": effects_requested,
                     "effects_applied": [],
-                    "effects_skipped": effects_skipped,
                     "render_log": self._log_entries,
                 }
             else:
                 self._log(f"  ⚠️  zoompan failed RC={result.returncode}, falling back to PIL")
-                # Fall through to PIL
                 result = self.motion.render(
                     input_image_path=actual_input,
                     output_path=str(out_path),
@@ -310,10 +376,10 @@ class CinematicShotEngine:
                     target_w=width,
                     target_h=height,
                     verbose=False,
+                    frame_debug_path=frame_debug_path,
                 )
                 elapsed = time.perf_counter() - start
                 result["render_time_sec"] = round(elapsed, 1)
-                result["effects_requested"] = effects_requested
                 result["preset"] = preset.name
                 result["render_log"] = self._log_entries
                 return result
@@ -329,29 +395,45 @@ class CinematicShotEngine:
                 target_w=width,
                 target_h=height,
                 verbose=False,
+                frame_debug_path=frame_debug_path,
             )
             elapsed = time.perf_counter() - start
             effects_applied = result.get("effects_applied", [])
             effects_skipped = result.get("effects_skipped", [])
-            final_result = {
-                **result,
-                "status": result.get("status", "failed"),
-                "preset": preset.name,
-                "fps": actual_fps,
-                "resolution": f"{width}×{height}",
+            manifest_base = {
+                "preset_name": preset.name,
+                "schema_version": "v1",
+                "timeline_applied": {
+                    "hold_start_sec": preset.hold_start_dur,
+                    "main_move_start_sec": preset.move_start,
+                    "main_move_end_sec": preset.move_end,
+                    "hold_end_sec": preset.hold_end_dur,
+                },
+                "camera_params_applied": {
+                    "move": preset.move(),
+                    "zoom_start": preset.zoom_start,
+                    "zoom_end": preset.zoom_end,
+                    "x_start": preset.x_start,
+                    "x_end": preset.x_end,
+                    "y_start": preset.y_start,
+                    "y_end": preset.y_end,
+                    "rotation_start_deg": preset.rot_start,
+                    "rotation_end_deg": preset.rot_end,
+                    "easing": preset.easing(),
+                },
                 "effects_requested": effects_requested,
                 "effects_applied": effects_applied,
                 "effects_skipped": effects_skipped,
+            }
+            final_result = {
+                **manifest_base,
+                **result,
+                "status": result.get("status", "failed"),
+                "fps": actual_fps,
+                "resolution": f"{width}×{height}",
                 "render_time_sec": round(elapsed, 1),
                 "render_log": self._log_entries,
             }
-
-        # Cleanup
-        if temp_frame and temp_frame.exists():
-            try:
-                temp_frame.unlink()
-            except Exception:
-                pass
 
         return final_result
 
@@ -372,6 +454,7 @@ class CinematicShotEngine:
         if preset.parallax > 0:
             effects.append("parallax")
         return effects
+
 
     def _list_presets(self) -> list:
         from preset import list_presets

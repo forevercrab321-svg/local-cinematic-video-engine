@@ -402,6 +402,7 @@ class MotionRenderer:
         target_w: int,
         target_h: int,
         verbose: bool = True,
+        frame_debug_path: str | None = None,
     ) -> dict:
         """PIL per-frame → FFmpeg encode. Fully graceful."""
         import time
@@ -459,10 +460,23 @@ class MotionRenderer:
                     print(f"  [PIL] Effects skipped: {effects_skipped}")
 
             # Generate frames
+            frame_debug: list[dict] = []
             for i in range(total_frames):
                 zoom, pan_x_n, pan_y_n, shake_x, shake_y = self._compute_frame(
                     i, total_frames, preset, src_w, src_h, target_w, target_h
                 )
+
+                # Collect per-frame debug data
+                if frame_debug_path is not None:
+                    frame_debug.append({
+                        "frame": i,
+                        "zoom": round(zoom, 6),
+                        "pan_x": round(pan_x_n, 6),
+                        "pan_y": round(pan_y_n, 6),
+                        "rotation": 0.0,          # reserved for future rot support
+                        "shake_x": round(shake_x, 4),
+                        "shake_y": round(shake_y, 4),
+                    })
 
                 # Apply zoom
                 zoomed_w = src_w * zoom
@@ -484,6 +498,15 @@ class MotionRenderer:
                 if verbose and (i + 1) % fps == 0:
                     pct = (i + 1) / total_frames * 100
                     print(f"  [{pct:.0f}%] {i+1}/{total_frames} frames")
+
+            # Write frame debug data
+            if frame_debug_path is not None and frame_debug:
+                import json as _json
+                debug_out = Path(frame_debug_path)
+                debug_out.parent.mkdir(parents=True, exist_ok=True)
+                debug_out.write_text(_json.dumps(frame_debug, indent=2))
+                if verbose:
+                    print(f"  [DEBUG] Frame data → {debug_out} ({len(frame_debug)} frames)")
 
             if verbose:
                 print(f"  [PIL] Encoding → {output_path}...")
@@ -521,6 +544,7 @@ class MotionRenderer:
                     "fps": fps,
                     "resolution": f"{target_w}×{target_h}",
                     "method": "pil",
+                    "frame_debug_path": frame_debug_path,
                     "effects_requested": [EffectRegistry.effects_requested(preset)],
                     "effects_applied": effects_applied,
                     "effects_skipped": effects_skipped,
@@ -554,6 +578,7 @@ class MotionRenderer:
         target_w: int = 1080,
         target_h: int = 1920,
         verbose: bool = True,
+        frame_debug_path: str | None = None,
     ) -> dict:
         """
         Render cinematic video.
@@ -566,182 +591,166 @@ class MotionRenderer:
         start = time.perf_counter()
         tmp_frame: Optional[Path] = None
 
-        # Resolve input
+        # Resolve input — motion.py only accepts images (videos rejected upstream in engine.py)
         input_path = Path(input_image_path)
-        is_video = input_path.suffix.lower() in (".mp4", ".mov", ".avi", ".mkv", ".webm")
-        if is_video:
-            tmp_frame = Path(tempfile.gettempdir()) / f"mot_first_{os.getpid()}.jpg"
-            extr = subprocess.run([
-                self.ffmpeg, "-y", "-i", str(input_path),
-                "-vframes", "1", "-q:v", "2", str(tmp_frame)
-            ], capture_output=True, text=True, timeout=30)
-            if extr.returncode != 0 or not tmp_frame.exists():
-                return {"status": "failed", "error": f"Frame extract failed: {extr.stderr[-150:]}"}
-            actual_input = str(tmp_frame)
-        else:
-            actual_input = str(input_path)
+        actual_input = str(input_path)
 
-        try:
-            has_motion = (
-                preset.zoom_start != preset.zoom_end
-                or preset.x_start != preset.x_end
-                or preset.y_start != preset.y_end
-                or preset.rot_start != preset.rot_end
-                or preset.micro_shake > 0
-                or preset.breathing > 0
-            )
+        has_motion = (
+        preset.zoom_start != preset.zoom_end
+        or preset.x_start != preset.x_end
+        or preset.y_start != preset.y_end
+        or preset.rot_start != preset.rot_end
+        or preset.micro_shake > 0
+        or preset.breathing > 0
+        )
 
-            if not has_motion:
-                # === PATH 1: STATIC (direct FFmpeg) ===
-                if verbose:
-                    print(f"  [static] No motion — direct FFmpeg")
+        if not has_motion:
+            # === PATH 1: STATIC (direct FFmpeg) ===
+            if verbose:
+                print(f"  [static] No motion — direct FFmpeg")
 
-                # Determine lighting effects for static path too
-                vf_parts = []
-                effects_applied = []
-                effects_skipped = []
+            # Determine lighting effects for static path too
+            vf_parts = []
+            effects_applied = []
+            effects_skipped = []
 
-                if preset.flicker > 0:
-                    vf_parts.append(f"eq=brightness={preset.flicker}*sin(t*25):contrast=1.0")
-                    effects_applied.append(f"flicker({preset.flicker})")
-                else:
-                    effects_skipped.append("flicker(intensity=0)")
+            if preset.flicker > 0:
+                vf_parts.append(f"eq=brightness={preset.flicker}*sin(t*25):contrast=1.0")
+                effects_applied.append(f"flicker({preset.flicker})")
+            else:
+                effects_skipped.append("flicker(intensity=0)")
 
-                if preset.glow_drift > 0:
-                    vf_parts.append(f"eq=contrast={1+preset.glow_drift}:brightness={preset.glow_drift*0.5}")
-                    effects_applied.append(f"glow_drift({preset.glow_drift})")
-                else:
-                    effects_skipped.append("glow_drift(intensity=0)")
+            if preset.glow_drift > 0:
+                vf_parts.append(f"eq=contrast={1+preset.glow_drift}:brightness={preset.glow_drift*0.5}")
+                effects_applied.append(f"glow_drift({preset.glow_drift})")
+            else:
+                effects_skipped.append("glow_drift(intensity=0)")
 
-                if preset.vignette_pulse > 0:
-                    freq = 0.4
-                    vf_parts.append(
-                        f"eq=brightness={preset.vignette_pulse}*sin(t*{freq}*{2*math.pi}):contrast=1.0"
-                    )
-                    effects_applied.append(f"vignette_pulse({preset.vignette_pulse})")
-                else:
-                    effects_skipped.append("vignette_pulse(intensity=0)")
-
-                if verbose and effects_applied:
-                    print(f"  [static] Effects applied: {effects_applied}")
-
-                vf = ",".join(vf_parts) if vf_parts else None
-                cmd = [self.ffmpeg, "-y", "-loop", "1", "-i", actual_input,
-                       "-t", str(preset.duration)]
-                if vf:
-                    cmd += ["-vf", vf]
-                cmd += [
-                    "-vf", "scale=1080:1920:force_original_aspect_ratio=decrease,"
-                           "pad=1080:1920:(ow-iw)/2:(oh-ih)/2,fps=24"
-                           if not vf else (
-                               f"scale=1080:1920:force_original_aspect_ratio=decrease,"
-                               f"pad=1080:1920:(ow-iw)/2:(oh-ih)/2,"
-                               f"{vf},fps=24"
-                           ),
-                    "-c:v", "libx264", "-pix_fmt", "yuv420p",
-                    "-preset", "fast", "-crf", "18",
-                    "-movflags", "+faststart",
-                    output_path,
-                ]
-
-                # Fix: only one -vf
-                if not vf:
-                    cmd = [self.ffmpeg, "-y", "-loop", "1", "-i", actual_input,
-                           "-t", str(preset.duration),
-                           "-vf", "scale=1080:1920:force_original_aspect_ratio=decrease,"
-                                  "pad=1080:1920:(ow-iw)/2:(oh-ih)/2,fps=24",
-                           "-c:v", "libx264", "-pix_fmt", "yuv420p",
-                           "-preset", "fast", "-crf", "18",
-                           "-movflags", "+faststart",
-                           output_path]
-
-                cmd_path = Path(output_path).with_suffix(".ffmpeg.cmd.txt")
-                cmd_path.write_text(" ".join(cmd))
-
-                result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
-                elapsed = time.perf_counter() - start
-                stderr_path = Path(output_path).with_suffix(".ffmpeg.stderr.log")
-                stderr_path.write_text(result.stderr)
-
-                if result.returncode == 0 and Path(output_path).exists():
-                    size_mb = Path(output_path).stat().st_size / (1024 * 1024)
-                    if verbose:
-                        print(f"  ✅ {Path(output_path).name} — {size_mb:.2f}MB | {elapsed:.1f}s")
-                    return {
-                        "status": "success",
-                        "output_path": output_path,
-                        "file_size_mb": round(size_mb, 2),
-                        "duration": preset.duration,
-                        "render_time_sec": round(elapsed, 1),
-                        "fps": fps,
-                        "resolution": f"{target_w}×{target_h}",
-                        "method": "static_ffmpeg",
-                        "effects_requested": EffectRegistry.effects_requested(preset),
-                        "effects_applied": effects_applied,
-                        "effects_skipped": effects_skipped,
-                        "lighting_vf": vf,
-                    }
-                else:
-                    return {
-                        "status": "failed",
-                        "error": f"static FFmpeg RC={result.returncode}",
-                        "render_time_sec": round(elapsed, 1),
-                        "method": "static_ffmpeg",
-                        "effects_applied": effects_applied,
-                        "effects_skipped": effects_skipped,
-                    }
-
-            elif self._can_use_zoompan(preset):
-                # === PATH 2: ZOOMPAN (fast, linear only) ===
-                if verbose:
-                    print(f"  [zoompan] Linear zoom — fast path")
-
-                cmd, desc = self._build_zoompan_command(
-                    actual_input, output_path, preset, fps, target_w, target_h
+            if preset.vignette_pulse > 0:
+                freq = 0.4
+                vf_parts.append(
+                    f"eq=brightness={preset.vignette_pulse}*sin(t*{freq}*{2*math.pi}):contrast=1.0"
                 )
+                effects_applied.append(f"vignette_pulse({preset.vignette_pulse})")
+            else:
+                effects_skipped.append("vignette_pulse(intensity=0)")
+
+            if verbose and effects_applied:
+                print(f"  [static] Effects applied: {effects_applied}")
+
+            vf = ",".join(vf_parts) if vf_parts else None
+            cmd = [self.ffmpeg, "-y", "-loop", "1", "-i", actual_input,
+                   "-t", str(preset.duration)]
+            if vf:
+                cmd += ["-vf", vf]
+            cmd += [
+                "-vf", "scale=1080:1920:force_original_aspect_ratio=decrease,"
+                       "pad=1080:1920:(ow-iw)/2:(oh-ih)/2,fps=24"
+                       if not vf else (
+                           f"scale=1080:1920:force_original_aspect_ratio=decrease,"
+                           f"pad=1080:1920:(ow-iw)/2:(oh-ih)/2,"
+                           f"{vf},fps=24"
+                       ),
+                "-c:v", "libx264", "-pix_fmt", "yuv420p",
+                "-preset", "fast", "-crf", "18",
+                "-movflags", "+faststart",
+                output_path,
+            ]
+
+            # Fix: only one -vf
+            if not vf:
+                cmd = [self.ffmpeg, "-y", "-loop", "1", "-i", actual_input,
+                       "-t", str(preset.duration),
+                       "-vf", "scale=1080:1920:force_original_aspect_ratio=decrease,"
+                              "pad=1080:1920:(ow-iw)/2:(oh-ih)/2,fps=24",
+                       "-c:v", "libx264", "-pix_fmt", "yuv420p",
+                       "-preset", "fast", "-crf", "18",
+                       "-movflags", "+faststart",
+                       output_path]
+
+            cmd_path = Path(output_path).with_suffix(".ffmpeg.cmd.txt")
+            cmd_path.write_text(" ".join(cmd))
+
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+            elapsed = time.perf_counter() - start
+            stderr_path = Path(output_path).with_suffix(".ffmpeg.stderr.log")
+            stderr_path.write_text(result.stderr)
+
+            if result.returncode == 0 and Path(output_path).exists():
+                size_mb = Path(output_path).stat().st_size / (1024 * 1024)
                 if verbose:
-                    print(f"  {desc}")
+                    print(f"  ✅ {Path(output_path).name} — {size_mb:.2f}MB | {elapsed:.1f}s")
+                return {
+                    "status": "success",
+                    "output_path": output_path,
+                    "file_size_mb": round(size_mb, 2),
+                    "duration": preset.duration,
+                    "render_time_sec": round(elapsed, 1),
+                    "fps": fps,
+                    "resolution": f"{target_w}×{target_h}",
+                    "method": "static_ffmpeg",
+                    "effects_requested": EffectRegistry.effects_requested(preset),
+                    "effects_applied": effects_applied,
+                    "effects_skipped": effects_skipped,
+                    "lighting_vf": vf,
+                }
+            else:
+                return {
+                    "status": "failed",
+                    "error": f"static FFmpeg RC={result.returncode}",
+                    "render_time_sec": round(elapsed, 1),
+                    "method": "static_ffmpeg",
+                    "effects_applied": effects_applied,
+                    "effects_skipped": effects_skipped,
+                }
 
-                cmd_path = Path(output_path).with_suffix(".ffmpeg.cmd.txt")
-                cmd_path.write_text(" ".join(cmd))
+        elif self._can_use_zoompan(preset):
+            # === PATH 2: ZOOMPAN (fast, linear only) ===
+            if verbose:
+                print(f"  [zoompan] Linear zoom — fast path")
 
-                result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
-                elapsed = time.perf_counter() - start
-                stderr_path = Path(output_path).with_suffix(".ffmpeg.stderr.log")
-                stderr_path.write_text(result.stderr)
-
-                if result.returncode == 0 and Path(output_path).exists():
-                    size_mb = Path(output_path).stat().st_size / (1024 * 1024)
-                    if verbose:
-                        print(f"  ✅ {Path(output_path).name} — {size_mb:.2f}MB | {elapsed:.1f}s [zoompan]")
-                    return {
-                        "status": "success",
-                        "output_path": output_path,
-                        "file_size_mb": round(size_mb, 2),
-                        "duration": preset.duration,
-                        "render_time_sec": round(elapsed, 1),
-                        "frame_count": int(preset.duration * fps),
-                        "fps": fps,
-                        "resolution": f"{target_w}×{target_h}",
-                        "method": "zoompan",
-                        "effects_requested": EffectRegistry.effects_requested(preset),
-                        "effects_applied": [],
-                        "effects_skipped": ["breathing", "micro_shake", "vignette_pulse", "flicker", "glow_drift"],
-                        "description": desc,
-                    }
-                else:
-                    if verbose:
-                        print(f"  ⚠️  zoompan failed RC={result.returncode}, falling back to PIL")
-                    # Fall through to PIL
-
-            # === PATH 3: PIL PER-FRAME (universal) ===
-            return self._render_pil(
-                actual_input, output_path, preset, fps, target_w, target_h, verbose
+            cmd, desc = self._build_zoompan_command(
+                actual_input, output_path, preset, fps, target_w, target_h
             )
+            if verbose:
+                print(f"  {desc}")
 
-        finally:
-            if tmp_frame and tmp_frame.exists():
-                try:
-                    tmp_frame.unlink()
-                except Exception:
-                    pass
+            cmd_path = Path(output_path).with_suffix(".ffmpeg.cmd.txt")
+            cmd_path.write_text(" ".join(cmd))
+
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+            elapsed = time.perf_counter() - start
+            stderr_path = Path(output_path).with_suffix(".ffmpeg.stderr.log")
+            stderr_path.write_text(result.stderr)
+
+            if result.returncode == 0 and Path(output_path).exists():
+                size_mb = Path(output_path).stat().st_size / (1024 * 1024)
+                if verbose:
+                    print(f"  ✅ {Path(output_path).name} — {size_mb:.2f}MB | {elapsed:.1f}s [zoompan]")
+                return {
+                    "status": "success",
+                    "output_path": output_path,
+                    "file_size_mb": round(size_mb, 2),
+                    "duration": preset.duration,
+                    "render_time_sec": round(elapsed, 1),
+                    "frame_count": int(preset.duration * fps),
+                    "fps": fps,
+                    "resolution": f"{target_w}×{target_h}",
+                    "method": "zoompan",
+                    "effects_requested": EffectRegistry.effects_requested(preset),
+                    "effects_applied": [],
+                    "effects_skipped": ["breathing", "micro_shake", "vignette_pulse", "flicker", "glow_drift"],
+                    "description": desc,
+                }
+            else:
+                if verbose:
+                    print(f"  ⚠️  zoompan failed RC={result.returncode}, falling back to PIL")
+                # Fall through to PIL
+
+        # === PATH 3: PIL PER-FRAME (universal) ===
+        return self._render_pil(
+            actual_input, output_path, preset, fps, target_w, target_h,
+            verbose, frame_debug_path=frame_debug_path,
+        )
+
+

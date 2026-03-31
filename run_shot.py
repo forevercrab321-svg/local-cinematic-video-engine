@@ -29,8 +29,16 @@ from preset import load_preset, Preset
 # =============================================================================
 
 def system_check():
-    """Verify ffmpeg + dependencies."""
+    """Verify ffmpeg + dependencies and display input contract."""
     print("🎬 CinematicShotEngine — System Check")
+    print("=" * 40)
+    print()
+    print("  INPUT CONTRACT (strict):")
+    print("  ✅ Supported:  .jpg .jpeg .png .webp (keyframe images)")
+    print("  ❌ Rejected:   .mp4 .mov .mkv .avi (video files)")
+    print()
+    print("  OUTPUT: cinematic shot video (.mp4, H.264, 24fps, 9:16)")
+    print()
     print("=" * 40)
 
     # ffmpeg
@@ -262,7 +270,7 @@ def main():
 
     shot_id = args.shot or Path(args.image).stem
 
-    render(
+    result = render(
         image=args.image,
         preset_name=args.preset,
         output=args.output,
@@ -274,6 +282,15 @@ def main():
         intensity=args.intensity,
         shot_id=shot_id,
     )
+
+    # Handle video rejection
+    if result.get("status") == "failed" and result.get("input_type") == "video_rejected":
+        print(f"\n❌ INPUT ERROR: Video file rejected.")
+        print(f"   {result['error']}")
+        print(f"\n   Hint: local_cinematic_video_engine is an IMAGE-TO-VIDEO engine.")
+        print(f"   Supported input: keyframe image (.jpg, .png, .webp)")
+        print(f"   To convert video to images, use local_video_ingest skill first.")
+        return
 
     # Print debug command files if available
     from pathlib import Path
