@@ -285,6 +285,7 @@ class SceneManifest:
 
     def validate_or_raise(self):
         """Validate and raise SceneValidationError if invalid."""
+        from preset import load_preset  # avoid circular import
         errors = self.validate()
         if errors:
             raise SceneValidationError(errors)

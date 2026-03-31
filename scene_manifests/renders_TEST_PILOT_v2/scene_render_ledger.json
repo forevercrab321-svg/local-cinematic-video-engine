@@ -1,0 +1,246 @@
+{
+  "project": "TEST_PILOT",
+  "output_dir": "scene_manifests/renders_TEST_PILOT_v2",
+  "started_at": "2026-03-31T06:08:28.074324",
+  "completed_at": "2026-03-31T06:08:47.607802",
+  "total_shots": 4,
+  "success_count": 4,
+  "failed_count": 0,
+  "skipped_count": 0,
+  "in_progress_count": 0,
+  "pending_count": 0,
+  "total_render_time_sec": 19.517822802008595,
+  "total_wall_clock_sec": 0.0,
+  "shots": [
+    {
+      "shot_id": "SHOT_01",
+      "scene_index": 0,
+      "preset": "suspense_push",
+      "duration_sec": 5.0,
+      "fps": 24,
+      "aspect_ratio": "9:16",
+      "input_image": "/Users/monsterlee/.openclaw/media/inbound/file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+      "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/scene_manifests/SHOT_01_suspense_push.mp4",
+      "caption_text": "He was about to find out...",
+      "dialogue": null,
+      "note": "Hero front \u2014 breathing should be visible in frame_debug",
+      "risk_level": "safe",
+      "shot_type": "hero_front",
+      "camera_override": null,
+      "camera_intensity": 1.0,
+      "status": "success",
+      "method": "pil",
+      "engine_mode": "pil",
+      "file_size_mb": 0.38,
+      "render_time_sec": 5.393617589004862,
+      "wall_clock_start": "2026-03-31T06:08:28.083877",
+      "wall_clock_end": "2026-03-31T06:08:33.478187",
+      "timeline_applied": {
+        "hold_start_sec": 1.2,
+        "main_move_start_sec": 1.2,
+        "main_move_end_sec": 4.0,
+        "hold_end_sec": 1.0
+      },
+      "camera_params_applied": {
+        "move": "push_in",
+        "zoom_start": 1.0,
+        "zoom_end": 1.12,
+        "x_start": 0.5,
+        "x_end": 0.5,
+        "y_start": 0.5,
+        "y_end": 0.5,
+        "rotation_start_deg": 0.0,
+        "rotation_end_deg": 0.1,
+        "easing": "ease_in_out"
+      },
+      "effects_requested": [
+        [
+          "micro_shake",
+          "breathing",
+          "flicker",
+          "vignette_pulse",
+          "glow_drift"
+        ]
+      ],
+      "effects_applied": [
+        "flicker(0.02)",
+        "glow_drift(0.03)",
+        "vignette_pulse(0.06)"
+      ],
+      "effects_skipped": [],
+      "error": null,
+      "frame_count": 120
+    },
+    {
+      "shot_id": "SHOT_02",
+      "scene_index": 1,
+      "preset": "heartbreak_drift",
+      "duration_sec": 5.0,
+      "fps": 24,
+      "aspect_ratio": "9:16",
+      "input_image": "/Users/monsterlee/.openclaw/media/inbound/file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+      "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/scene_manifests/SHOT_02_heartbreak_drift.mp4",
+      "caption_text": null,
+      "dialogue": null,
+      "note": "Slow pull-out \u2014 emotional recession",
+      "risk_level": "safe",
+      "shot_type": "medium",
+      "camera_override": null,
+      "camera_intensity": 1.0,
+      "status": "success",
+      "method": "pil",
+      "engine_mode": "pil",
+      "file_size_mb": 0.33,
+      "render_time_sec": 5.120283835000009,
+      "wall_clock_start": "2026-03-31T06:08:33.479051",
+      "wall_clock_end": "2026-03-31T06:08:38.599943",
+      "timeline_applied": {
+        "hold_start_sec": 0.4,
+        "main_move_start_sec": 0.4,
+        "main_move_end_sec": 4.6,
+        "hold_end_sec": 0.4
+      },
+      "camera_params_applied": {
+        "move": "pull_out",
+        "zoom_start": 1.0,
+        "zoom_end": 0.91,
+        "x_start": 0.5,
+        "x_end": 0.5,
+        "y_start": 0.5,
+        "y_end": 0.5,
+        "rotation_start_deg": 0.0,
+        "rotation_end_deg": -0.15,
+        "easing": "ease_in"
+      },
+      "effects_requested": [
+        [
+          "breathing",
+          "vignette_pulse"
+        ]
+      ],
+      "effects_applied": [
+        "vignette_pulse(0.04)"
+      ],
+      "effects_skipped": [
+        "flicker(intensity=0)",
+        "glow_drift(intensity=0)"
+      ],
+      "error": null,
+      "frame_count": 120
+    },
+    {
+      "shot_id": "SHOT_03",
+      "scene_index": 2,
+      "preset": "reveal_hold_push",
+      "duration_sec": 5.0,
+      "fps": 24,
+      "aspect_ratio": "9:16",
+      "input_image": "/Users/monsterlee/.openclaw/media/inbound/file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+      "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/scene_manifests/SHOT_03_reveal_hold_push.mp4",
+      "caption_text": "The look that changed everything",
+      "dialogue": null,
+      "note": "Hold then push \u2014 revelation moment",
+      "risk_level": "safe",
+      "shot_type": "face_closeup",
+      "camera_override": null,
+      "camera_intensity": 1.0,
+      "status": "success",
+      "method": "pil",
+      "engine_mode": "pil",
+      "file_size_mb": 0.39,
+      "render_time_sec": 5.340612665000663,
+      "wall_clock_start": "2026-03-31T06:08:38.600842",
+      "wall_clock_end": "2026-03-31T06:08:43.942068",
+      "timeline_applied": {
+        "hold_start_sec": 1.8,
+        "main_move_start_sec": 1.8,
+        "main_move_end_sec": 4.2,
+        "hold_end_sec": 0.8
+      },
+      "camera_params_applied": {
+        "move": "push_in",
+        "zoom_start": 1.0,
+        "zoom_end": 1.15,
+        "x_start": 0.5,
+        "x_end": 0.5,
+        "y_start": 0.5,
+        "y_end": 0.5,
+        "rotation_start_deg": 0.0,
+        "rotation_end_deg": 0.25,
+        "easing": "ease_out"
+      },
+      "effects_requested": [
+        [
+          "micro_shake",
+          "breathing",
+          "flicker",
+          "vignette_pulse",
+          "glow_drift"
+        ]
+      ],
+      "effects_applied": [
+        "flicker(0.04)",
+        "glow_drift(0.06)",
+        "vignette_pulse(0.03)"
+      ],
+      "effects_skipped": [],
+      "error": null,
+      "frame_count": 120
+    },
+    {
+      "shot_id": "SHOT_04",
+      "scene_index": 3,
+      "preset": "comedy_snap",
+      "duration_sec": 3.5,
+      "fps": 24,
+      "aspect_ratio": "9:16",
+      "input_image": "/Users/monsterlee/.openclaw/media/inbound/file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+      "output_file": "/Users/monsterlee/.openclaw/workspace/skills/local_cinematic_video_engine/scene_manifests/SHOT_04_comedy_snap.mp4",
+      "caption_text": "When you realize you forgot to hit record",
+      "dialogue": null,
+      "note": "Comedy timing \u2014 deadpan to reality crash",
+      "risk_level": "safe",
+      "shot_type": "reaction",
+      "camera_override": null,
+      "camera_intensity": 1.0,
+      "status": "success",
+      "method": "pil",
+      "engine_mode": "pil",
+      "file_size_mb": 0.19,
+      "render_time_sec": 3.6633087130030617,
+      "wall_clock_start": "2026-03-31T06:08:43.942940",
+      "wall_clock_end": "2026-03-31T06:08:47.606895",
+      "timeline_applied": {
+        "hold_start_sec": 1.0,
+        "main_move_start_sec": 1.5,
+        "main_move_end_sec": 2.0,
+        "hold_end_sec": 1.5
+      },
+      "camera_params_applied": {
+        "move": "static",
+        "zoom_start": 1.0,
+        "zoom_end": 1.015,
+        "x_start": 0.5,
+        "x_end": 0.5,
+        "y_start": 0.5,
+        "y_end": 0.5,
+        "rotation_start_deg": 0.0,
+        "rotation_end_deg": 0.0,
+        "easing": "ease_in_out"
+      },
+      "effects_requested": [
+        [
+          "breathing"
+        ]
+      ],
+      "effects_applied": [],
+      "effects_skipped": [
+        "flicker(intensity=0)",
+        "glow_drift(intensity=0)",
+        "vignette_pulse(intensity=0)"
+      ],
+      "error": null,
+      "frame_count": 84
+    }
+  ]
+}
