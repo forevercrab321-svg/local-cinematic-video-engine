@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+*.log
+*.stderr.log
+*.cmd.txt
+*.shot_manifest.json
+*.render_log.json
+demo_output/*.mp4
+demo_output/*.log

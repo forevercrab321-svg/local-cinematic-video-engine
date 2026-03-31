@@ -1,0 +1,79 @@
+{
+  "name": "heartbreak",
+  "description": "Emotional weight — slow pull-out, desaturation, heavy silence",
+  "mood_keywords": ["sad", "melancholy", "grief", "loss", "vulnerability"],
+
+  "camera_moves": [
+    {
+      "type": "pull_out",
+      "duration_frames": 144,
+      "intensity": 1.0,
+      "easing": "ease_in",
+      "description": "Slow retreat — isolation in frame grows"
+    },
+    {
+      "type": "tilt_down",
+      "duration_frames": 96,
+      "intensity": 0.5,
+      "description": "Eyes looking down, camera follows"
+    },
+    {
+      "type": "static",
+      "duration_frames": 48,
+      "intensity": 0.1,
+      "hold_frames": 72,
+      "description": "Still hold for emotional beat"
+    }
+  ],
+
+  "effects": [
+    {
+      "type": "breathing",
+      "intensity": 0.6,
+      "speed": 0.5,
+      "description": "Subtle chest rise/fall — emotional weight visible"
+    },
+    {
+      "type": "vignette_pulse",
+      "intensity": 0.3,
+      "speed": 0.15,
+      "description": "Soft vignette closing slowly"
+    },
+    {
+      "type": "film_grain",
+      "intensity": 0.2,
+      "description": "Subtle grain for analog warmth"
+    }
+  ],
+
+  "parallax": {
+    "enabled": true,
+    "layers": 2,
+    "split_mode": "horizontal",
+    "depth_factors": {
+      "background": 0.4,
+      "foreground": 0.8
+    }
+  },
+
+  "color_grade": {
+    "saturation": 0.5,
+    "contrast": 0.9,
+    "temperature": 2000,
+    "shadows": 10,
+    "highlights": -10,
+    "lift": 0.02,
+    "gamma": 0.95,
+    "teal_shadows": true,
+    "orange_highlights": true
+  },
+
+  "audio_suggestion": "Soft piano, distant strings, room tone",
+  "cut_recommendation": "Stay on beat 3-6 seconds, let emotion breathe",
+  "use_cases": [
+    "After a breakup realization",
+    "Reading bad news",
+    "Watching someone leave",
+    "Loneliness moment"
+  ]
+}

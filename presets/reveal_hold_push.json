@@ -1,0 +1,44 @@
+{
+  "name": "reveal_hold_push",
+  "description": "I see it... [beat]... OH F**K! Recognition → truth slam.",
+  "duration_sec": 5.0,
+  "fps": 24,
+  "aspect_ratio": "9:16",
+
+  "camera": {
+    "move": "push_in",
+    "zoom_start": 1.00,
+    "zoom_end": 1.15,
+    "x_start": 0.50,
+    "x_end": 0.50,
+    "y_start": 0.50,
+    "y_end": 0.50,
+    "rotation_start_deg": 0.0,
+    "rotation_end_deg": 0.25,
+    "easing": "ease_out"
+  },
+
+  "motion": {
+    "micro_shake": 0.008,
+    "breathing": 0.004,
+    "parallax_strength": 0.10
+  },
+
+  "lighting": {
+    "flicker": 0.04,
+    "vignette_pulse": 0.03,
+    "glow_drift": 0.06
+  },
+
+  "timing": {
+    "hold_start_sec": 1.8,
+    "main_move_start_sec": 1.8,
+    "main_move_end_sec": 4.2,
+    "hold_end_sec": 0.8
+  },
+
+  "output": {
+    "codec": "h264",
+    "pix_fmt": "yuv420p"
+  }
+}

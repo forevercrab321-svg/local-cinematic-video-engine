@@ -1,0 +1,134 @@
+{
+  "project": "IN_THE_GROUP_CHAT",
+  "genre": "comedy",
+  "total_duration_sec": 28.0,
+
+  "scene_manifest_version": "1.0",
+
+  "shots": [
+    {
+      "shot_id": "shot_01",
+      "shot_type": "hero_front",
+      "input_image": "/path/to/shot_01_keyframe.png",
+      "output_file": "shot_01.mp4",
+      "duration": 3.0,
+      "fps": 24,
+      "preset": "comedy_snap",
+      "camera_intensity": 0.8,
+      "camera_override": null,
+      "effects_additional": [],
+      "risk_level": "safe",
+      "caption_text": "POV: You found your aesthetic at 3 years old",
+      "dialogue": null
+    },
+    {
+      "shot_id": "shot_02",
+      "shot_type": "face_closeup",
+      "input_image": "/path/to/shot_02_keyframe.png",
+      "output_file": "shot_02.mp4",
+      "duration": 3.0,
+      "fps": 24,
+      "preset": "comedy_snap",
+      "camera_intensity": 0.5,
+      "camera_override": "static",
+      "effects_additional": [],
+      "risk_level": "safe",
+      "caption_text": "I'm not like other kids.",
+      "dialogue": "I'm not like other kids."
+    },
+    {
+      "shot_id": "shot_03",
+      "shot_type": "medium_front",
+      "input_image": "/path/to/shot_03_keyframe.png",
+      "output_file": "shot_03.mp4",
+      "duration": 3.0,
+      "fps": 24,
+      "preset": "comedy_snap",
+      "camera_intensity": 1.0,
+      "camera_override": "shake",
+      "effects_additional": [],
+      "risk_level": "safe",
+      "caption_text": "I only fw premium items",
+      "dialogue": null
+    },
+    {
+      "shot_id": "shot_04",
+      "shot_type": "face_closeup",
+      "input_image": "/path/to/shot_04_keyframe.png",
+      "output_file": "shot_04.mp4",
+      "duration": 3.0,
+      "fps": 24,
+      "preset": "heartbreak_drift",
+      "camera_intensity": 0.6,
+      "camera_override": "pull_out",
+      "effects_additional": [],
+      "risk_level": "safe",
+      "caption_text": "Mom voice: [Name], DINNER!",
+      "dialogue": null,
+      "note": "Reaction cut — mom's voice triggers reality crash"
+    },
+    {
+      "shot_id": "shot_05",
+      "shot_type": "medium",
+      "input_image": "/path/to/shot_05_keyframe.png",
+      "output_file": "shot_05.mp4",
+      "duration": 4.0,
+      "fps": 24,
+      "preset": "heartbreak_drift",
+      "camera_intensity": 0.8,
+      "camera_override": "pull_out",
+      "effects_additional": [],
+      "risk_level": "safe",
+      "caption_text": "Living my best life",
+      "dialogue": null,
+      "note": "Reality crash — now doing homework"
+    },
+    {
+      "shot_id": "shot_06",
+      "shot_type": "face_closeup",
+      "input_image": "/path/to/shot_06_keyframe.png",
+      "output_file": "shot_06.mp4",
+      "duration": 4.0,
+      "fps": 24,
+      "preset": "comedy_snap",
+      "camera_intensity": 0.4,
+      "camera_override": "static",
+      "effects_additional": [],
+      "risk_level": "safe",
+      "caption_text": "My advisor has concerns",
+      "dialogue": null,
+      "note": "Monkey judge moment — no words needed"
+    },
+    {
+      "shot_id": "shot_07",
+      "shot_type": "hero_front",
+      "input_image": "/path/to/shot_07_keyframe.png",
+      "output_file": "shot_07.mp4",
+      "duration": 3.0,
+      "fps": 24,
+      "preset": "comedy_snap",
+      "camera_intensity": 0.3,
+      "camera_override": null,
+      "effects_additional": [],
+      "risk_level": "safe",
+      "caption_text": "Back to the boardroom Monday",
+      "dialogue": null,
+      "note": "Tiny shrug — unbothered return"
+    }
+  ],
+
+  "editing_notes": {
+    "opening_hook": "0-3s: Hook text over hero pose",
+    "pacing": "comedy beats land at 3s intervals",
+    "music": "We Will Rock You — Queen (beat match to STOMP STOMP CLAP)",
+    "transitions": "hard cuts between all shots",
+    "ending_card": "IN THE GROUP CHAT + monkey judge emoji"
+  },
+
+  "render_config": {
+    "aspect_ratio": "9:16",
+    "quality": "high",
+    "codec": "h264",
+    "output_dir": "./renders/"
+  }
+}

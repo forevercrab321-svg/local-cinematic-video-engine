@@ -1,0 +1,77 @@
+{
+  "name": "suspense",
+  "description": "Tension-building shot — slow zoom, dark atmosphere, breath hold",
+  "mood_keywords": ["fear", "dread", "anticipation", "unease", "threat"],
+
+  "camera_moves": [
+    {
+      "type": "hesitate",
+      "duration_frames": 120,
+      "intensity": 1.2,
+      "hold_frames": 24,
+      "description": "Slow zoom in, hold, then sudden push — classic suspense reveal"
+    },
+    {
+      "type": "push_in",
+      "duration_frames": 96,
+      "intensity": 0.6,
+      "easing": "ease_in_out",
+      "description": "Gentle continuous push, building dread"
+    },
+    {
+      "type": "dolly_zoom",
+      "duration_frames": 72,
+      "intensity": 0.8,
+      "description": "Vertigo effect — unease without moving closer"
+    }
+  ],
+
+  "effects": [
+    {
+      "type": "vignette_pulse",
+      "intensity": 0.7,
+      "speed": 0.3,
+      "description": "Heavy vignette closing in"
+    },
+    {
+      "type": "film_grain",
+      "intensity": 0.4,
+      "description": "Subtle grain for tension"
+    },
+    {
+      "type": "glow_flicker",
+      "intensity": 0.3,
+      "description": "Light source instability"
+    }
+  ],
+
+  "parallax": {
+    "enabled": true,
+    "layers": 3,
+    "split_mode": "vertical",
+    "depth_factors": {
+      "background": 0.3,
+      "subject": 0.7,
+      "foreground": 1.2
+    }
+  },
+
+  "color_grade": {
+    "saturation": 0.7,
+    "contrast": 1.2,
+    "temperature": -1000,
+    "shadows": -20,
+    "highlights": -30,
+    "lift": 0.01,
+    "gamma": 1.1
+  },
+
+  "audio_suggestion": "Low drone, heartbeat, distant rumble",
+  "cut_recommendation": "Hold 2-4 seconds before cut to reveal",
+  "use_cases": [
+    "Character discovering something shocking",
+    "Approaching danger",
+    "Anticipating bad news",
+    "Secret about to be revealed"
+  ]
+}

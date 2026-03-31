@@ -1,0 +1,12 @@
+# local_cinematic_video_engine — requirements
+# Minimal dependencies — ffmpeg is the main dependency, everything else is Python standard library + PIL
+
+# Image processing (required)
+Pillow>=10.0.0
+numpy>=1.24.0
+
+# Video encoding (system binary, ensure installed)
+# ffmpeg: brew install ffmpeg
+
+# Optional: OpenCV for advanced masking
+# opencv-python-headless>=4.9.0

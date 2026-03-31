@@ -1,0 +1,78 @@
+{
+  "name": "reveal",
+  "description": "POV reveal — smash cut + zoom in, focus shift",
+  "mood_keywords": ["shock", "realization", "truth", "twist", "clarity"],
+
+  "camera_moves": [
+    {
+      "type": "shake",
+      "duration_frames": 12,
+      "intensity": 1.5,
+      "description": "Micro-shake at reveal moment — impact"
+    },
+    {
+      "type": "push_in",
+      "duration_frames": 48,
+      "intensity": 1.8,
+      "easing": "ease_out",
+      "description": "Fast push to new subject — focus shift"
+    },
+    {
+      "type": "hesitate",
+      "duration_frames": 36,
+      "intensity": 0.8,
+      "hold_frames": 12,
+      "description": "Brief hold, then hold even tighter on truth"
+    }
+  ],
+
+  "effects": [
+    {
+      "type": "lens_flare",
+      "intensity": 0.6,
+      "description": "Flash of insight — light flare at moment"
+    },
+    {
+      "type": "glow_flicker",
+      "intensity": 0.5,
+      "description": "Reality shift flicker"
+    },
+    {
+      "type": "color_grade_shift",
+      "intensity": 0.8,
+      "from_lut": "muted",
+      "to_lut": "high_contrast",
+      "description": "Color punch — muted to vivid at reveal"
+    }
+  ],
+
+  "parallax": {
+    "enabled": true,
+    "layers": 3,
+    "split_mode": "radial",
+    "depth_factors": {
+      "background": 0.2,
+      "subject": 1.0,
+      "foreground": 0.6
+    }
+  },
+
+  "color_grade": {
+    "saturation": 1.3,
+    "contrast": 1.4,
+    "temperature": -500,
+    "shadows": -10,
+    "highlights": 20,
+    "lift": -0.01,
+    "gamma": 1.05
+  },
+
+  "audio_suggestion": "Bass hit, sting, silence → music swell",
+  "cut_recommendation": "Cut at moment of reveal, stay on new subject 2-3 seconds",
+  "use_cases": [
+    "POV discovering the truth",
+    "Cut to reveal the other person",
+    "Showing what's being read/seen",
+    "Flash to real situation vs expectation"
+  ]
+}
