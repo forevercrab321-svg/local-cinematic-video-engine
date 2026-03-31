@@ -1,0 +1,126 @@
+{
+  "R1": {
+    "preset_name": "suspense_push_r1_golden",
+    "schema_version": "v1",
+    "timeline_applied": {
+      "hold_start_sec": 1.2,
+      "main_move_start_sec": 1.2,
+      "main_move_end_sec": 4.0,
+      "hold_end_sec": 1.0
+    },
+    "camera_params_applied": {
+      "move": "push_in",
+      "zoom_start": 1.0,
+      "zoom_end": 1.16,
+      "x_start": 0.5,
+      "x_end": 0.5,
+      "y_start": 0.5,
+      "y_end": 0.5,
+      "rotation_start_deg": 0.0,
+      "rotation_end_deg": 0.1,
+      "easing": "ease_in"
+    },
+    "effects_requested": [
+      [
+        "micro_shake",
+        "flicker",
+        "vignette_pulse",
+        "glow_drift"
+      ]
+    ],
+    "effects_applied": [
+      "flicker(0.02)",
+      "glow_drift(0.03)",
+      "vignette_pulse(0.06)"
+    ],
+    "effects_skipped": [],
+    "status": "success",
+    "output_path": "golden_locking/suspense_push_R1.mp4",
+    "file_size_mb": 0.29,
+    "duration": 5.0,
+    "render_time_sec": 4.9,
+    "frame_count": 120,
+    "fps": 24,
+    "resolution": "1080\u00d71920",
+    "method": "pil",
+    "frame_debug_path": null,
+    "lighting_vf": "eq=brightness=0.02*sin(t*25):contrast=1.0,eq=contrast=1.03:brightness=0.015,eq=brightness=0.06*sin(t*0.4*6.283185307179586):contrast=1.0",
+    "render_log": [
+      "[06:49:51] \ud83c\udfac file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+      "[06:49:51]    Preset: suspense_push_r1_golden | 1080\u00d71920 | 5.0s",
+      "[06:49:51]   Mode: cinematic motion (PIL per-frame)"
+    ],
+    "duration_sec": 5.0,
+    "schema_status": "new",
+    "engine_mode": "pil",
+    "route_selected": "pil",
+    "source_image": "/Users/monsterlee/.openclaw/media/inbound/file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+    "source_frame_extracted_from_video": null,
+    "degraded_mode_used": false,
+    "validation_status": "pass",
+    "cmd_file": null,
+    "stderr_file": null
+  },
+  "R2": {
+    "preset_name": "suspense_push_r2_golden",
+    "schema_version": "v1",
+    "timeline_applied": {
+      "hold_start_sec": 1.8,
+      "main_move_start_sec": 1.8,
+      "main_move_end_sec": 4.0,
+      "hold_end_sec": 1.0
+    },
+    "camera_params_applied": {
+      "move": "push_in",
+      "zoom_start": 1.0,
+      "zoom_end": 1.16,
+      "x_start": 0.5,
+      "x_end": 0.5,
+      "y_start": 0.5,
+      "y_end": 0.5,
+      "rotation_start_deg": 0.0,
+      "rotation_end_deg": 0.1,
+      "easing": "ease_in"
+    },
+    "effects_requested": [
+      [
+        "micro_shake",
+        "flicker",
+        "vignette_pulse",
+        "glow_drift"
+      ]
+    ],
+    "effects_applied": [
+      "flicker(0.02)",
+      "glow_drift(0.03)",
+      "vignette_pulse(0.03)"
+    ],
+    "effects_skipped": [],
+    "status": "success",
+    "output_path": "golden_locking/suspense_push_R2.mp4",
+    "file_size_mb": 0.25,
+    "duration": 5.0,
+    "render_time_sec": 4.7,
+    "frame_count": 120,
+    "fps": 24,
+    "resolution": "1080\u00d71920",
+    "method": "pil",
+    "frame_debug_path": null,
+    "lighting_vf": "eq=brightness=0.02*sin(t*25):contrast=1.0,eq=contrast=1.03:brightness=0.015,eq=brightness=0.03*sin(t*0.4*6.283185307179586):contrast=1.0",
+    "render_log": [
+      "[06:49:56] \ud83c\udfac file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+      "[06:49:56]    Preset: suspense_push_r2_golden | 1080\u00d71920 | 5.0s",
+      "[06:49:56]   Mode: cinematic motion (PIL per-frame)"
+    ],
+    "duration_sec": 5.0,
+    "schema_status": "new",
+    "engine_mode": "pil",
+    "route_selected": "pil",
+    "source_image": "/Users/monsterlee/.openclaw/media/inbound/file_3---5223086e-a136-4e3a-9c06-8c2363382b8b.jpg",
+    "source_frame_extracted_from_video": null,
+    "degraded_mode_used": false,
+    "validation_status": "pass",
+    "cmd_file": null,
+    "stderr_file": null
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "name": "suspense_push",
+  "description": "Slow dread build \u2192 beat \u2192 slam. Tension held until the release.",
+  "duration_sec": 5.0,
+  "fps": 24,
+  "aspect_ratio": "9:16",
+  "camera": {
+    "move": "push_in",
+    "zoom_start": 1.0,
+    "zoom_end": 1.16,
+    "x_start": 0.5,
+    "x_end": 0.5,
+    "y_start": 0.5,
+    "y_end": 0.5,
+    "rotation_start_deg": 0.0,
+    "rotation_end_deg": 0.1,
+    "easing": "ease_in"
+  },
+  "motion": {
+    "micro_shake": 0.006,
+    "breathing": 0.0,
+    "parallax_strength": 0.0
+  },
+  "lighting": {
+    "flicker": 0.02,
+    "vignette_pulse": 0.06,
+    "glow_drift": 0.03
+  },
+  "timing": {
+    "hold_start_sec": 1.2,
+    "main_move_start_sec": 1.2,
+    "main_move_end_sec": 4.0,
+    "hold_end_sec": 1.0
+  },
+  "output": {
+    "codec": "h264",
+    "pix_fmt": "yuv420p"
+  }
+}
